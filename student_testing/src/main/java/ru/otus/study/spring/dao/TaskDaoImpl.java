@@ -35,9 +35,11 @@ public class TaskDaoImpl implements TaskDao {
             List<String[]> data = reader.readAll();
             for (String[] line : data) {
                 CsvDataParser csvDataParser = new CsvDataParser(line).invoke();
-                StudentTask task = csvDataParser.getTask();
-                tasks.put(task, csvDataParser.getAnswers());
-                taskCorrectAnswersMapping.put(task, csvDataParser.getCorrectAnswers());
+                if (csvDataParser.hasAnswers()) {
+                    StudentTask task = csvDataParser.getTask();
+                    tasks.put(task, csvDataParser.getAnswers());
+                    taskCorrectAnswersMapping.put(task, csvDataParser.getCorrectAnswers());
+                }
             }
         }
     }
@@ -75,6 +77,10 @@ public class TaskDaoImpl implements TaskDao {
             return answers;
         }
 
+        boolean hasAnswers() {
+            return !answers.isEmpty();
+        }
+
         List<Answer> getCorrectAnswers() {
             return correctAnswers;
         }
@@ -84,13 +90,20 @@ public class TaskDaoImpl implements TaskDao {
             answers = new ArrayList<>();
             correctAnswers = new ArrayList<>();
             for (int i = 1; i < line.length; i++) {
-                Answer answer = new Answer(normalizeAnswer(line[i]));
+                tryParseAnswer(line[i]);
+            }
+            return this;
+        }
+
+        private void tryParseAnswer(String answerData) {
+            String answerText = normalizeAnswer(answerData).trim();
+            if (!answerText.isEmpty()) {
+                Answer answer = new Answer(normalizeAnswer(answerData));
                 answers.add(answer);
-                if (isAnswerCorrect(line[i])) {
+                if (isAnswerCorrect(answerData)) {
                     correctAnswers.add(answer);
                 }
             }
-            return this;
         }
 
         private String normalizeAnswer(String answer) {
