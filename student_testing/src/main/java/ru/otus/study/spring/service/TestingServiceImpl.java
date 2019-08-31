@@ -5,6 +5,7 @@ import ru.otus.study.spring.domain.StudentAnswer;
 import ru.otus.study.spring.domain.StudentTask;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,11 +19,11 @@ public class TestingServiceImpl implements TestingService {
         this.interactionService = interactionService;
     }
 
-    public List<StudentAnswer> processTestingAndGetResults() {
+    public List<StudentAnswer> processTestingAndGetReadOnlyResults() {
         interactionService.greetUser();
         List<StudentTask> studentTasks = taskDao.getTasks();
         studentTasks.forEach(this::askTask);
-        return answers;
+        return Collections.unmodifiableList(answers);
     }
 
     private void askTask(StudentTask studentTask) {

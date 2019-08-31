@@ -5,6 +5,7 @@ import ru.otus.study.spring.domain.*;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,7 +20,7 @@ public class TaskCheckServiceImpl implements TaskCheckService {
     }
 
     @Override
-    public void checkAnswersAndShowResults(Iterable<StudentAnswer> answers, StudentNameInfo studentNameInfo) {
+    public void checkAnswersAndShowResults(Collection<StudentAnswer> answers, StudentNameInfo studentNameInfo) {
         int correctTasks = 0;
         for (StudentAnswer answer : answers) {
             if (checkTask(answer)) correctTasks++;

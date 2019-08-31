@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface TestingService {
 
-    Iterable<StudentAnswer> processTestingAndGetResults();
+    List<StudentAnswer> processTestingAndGetReadOnlyResults();
 
 }
