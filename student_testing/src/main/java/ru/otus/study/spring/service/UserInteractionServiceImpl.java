@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 public class UserInteractionServiceImpl implements UserInteractionService {
     private final TaskDao taskDao;
-    private final DataReaderService dataReaderService;
+    private final IOService ioService;
 
-    public UserInteractionServiceImpl(TaskDao taskDao, DataReaderService dataReaderService) {
+    public UserInteractionServiceImpl(TaskDao taskDao, IOService ioService) {
         this.taskDao = taskDao;
-        this.dataReaderService = dataReaderService;
+        this.ioService = ioService;
     }
 
     @Override
@@ -28,12 +28,12 @@ public class UserInteractionServiceImpl implements UserInteractionService {
 
     @Override
     public void greetUser() {
-        System.out.println("Добро пожаловать в тест. Для выбора ответа вводите его номер. Для выбора нескольких вариантов, вводите их через пробел.");
+       ioService.printOutput("Добро пожаловать в тест. Для выбора ответа вводите его номер. Для выбора нескольких вариантов, вводите их через пробел.");
     }
 
     private Map<Integer, Answer> showQuestionAndGetAnswerVariants(StudentTask studentTask) {
         List<Answer> answerList = taskDao.getAnswerVariants(studentTask);
-        System.out.println(studentTask.getQuestion());
+        ioService.printOutput(studentTask.getQuestion());
         return convertAnswersListToMap(answerList);
     }
 
@@ -42,7 +42,7 @@ public class UserInteractionServiceImpl implements UserInteractionService {
     }
 
     private void showAnswers(Map<Integer, Answer> answers) {
-        answers.forEach((id, answer) -> System.out.println(MessageFormat.format("\t{0}. {1}", id, answer.getContent())));
+        answers.forEach((id, answer) -> ioService.printOutput(MessageFormat.format("\t{0}. {1}", id, answer.getContent())));
     }
 
     private Set<Answer> readStudentAnswers(Map<Integer, Answer> answers) {
@@ -54,7 +54,7 @@ public class UserInteractionServiceImpl implements UserInteractionService {
 
     private List<Integer> tryReadAnswer(int maxAnswerIndex) {
         String answer;
-        if ((answer = dataReaderService.getUserInput()) != null) {
+        if ((answer = ioService.getUserInput()) != null) {
             final List<Integer> indexList = tryParseInt(maxAnswerIndex, answer);
             if (!indexList.isEmpty())
                 return indexList;
@@ -69,7 +69,7 @@ public class UserInteractionServiceImpl implements UserInteractionService {
     }
 
     private List<Integer> repeatAnswerReading(int maxAnswerIndex) {
-        System.out.println("Вы не выбрали вариант ответа. Повторите выбор.");
+        ioService.printOutput("Вы не выбрали вариант ответа. Повторите выбор.");
         return tryReadAnswer(maxAnswerIndex);
     }
 

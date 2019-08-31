@@ -2,10 +2,10 @@ package ru.otus.study.spring.service;
 
 import java.util.Scanner;
 
-public class DataReaderServiceImpl implements DataReaderService {
+public class IOServiceImpl implements IOService {
     private final Scanner scanner;
 
-    public DataReaderServiceImpl() {
+    public IOServiceImpl() {
         this.scanner = new Scanner(System.in);
     }
 
@@ -13,5 +13,10 @@ public class DataReaderServiceImpl implements DataReaderService {
     @Override
     public String getUserInput() {
             return scanner.nextLine();
+    }
+
+    @Override
+    public void printOutput(String data) {
+        System.out.println(data);
     }
 }
