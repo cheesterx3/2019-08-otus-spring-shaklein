@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="resultPresenter" class="ru.otus.study.spring.service.TestResultPresenterImpl"/>
+    <bean id="dataReader" class="ru.otus.study.spring.service.DataReaderServiceImpl"/>
+
+    <bean id="taskDao" class="ru.otus.study.spring.dao.TaskDaoImpl">
+        <constructor-arg name="dataUrl" value="/data.csv"/>
+    </bean>
+
+    <bean id="askService" class="ru.otus.study.spring.service.StudentInfoAskServiceImpl">
+        <constructor-arg name="dataReaderService" ref="dataReader"/>
+    </bean>
+
+    <bean id="interactionService" class="ru.otus.study.spring.service.UserInteractionServiceImpl">
+        <constructor-arg name="taskDao" ref="taskDao"/>
+        <constructor-arg name="dataReaderService" ref="dataReader"/>
+    </bean>
+    <bean id="checkService" class="ru.otus.study.spring.service.TaskCheckServiceImpl">
+        <constructor-arg name="taskDao" ref="taskDao"/>
+        <constructor-arg name="resultPresenter" ref="resultPresenter"/>
+    </bean>
+    <bean id="testingService" class="ru.otus.study.spring.service.TestingServiceImpl">
+        <constructor-arg name="taskDao" ref="taskDao"/>
+        <constructor-arg name="interactionService" ref="interactionService"/>
+    </bean>
+
+</beans>
