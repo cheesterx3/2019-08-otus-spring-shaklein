@@ -3,21 +3,22 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-
-    <bean id="resultPresenter" class="ru.otus.study.spring.service.TestResultPresenterImpl"/>
-    <bean id="dataReader" class="ru.otus.study.spring.service.DataReaderServiceImpl"/>
+    <bean id="ioService" class="ru.otus.study.spring.service.IOServiceImpl"/>
 
     <bean id="taskDao" class="ru.otus.study.spring.dao.TaskDaoImpl">
         <constructor-arg name="dataUrl" value="/data.csv"/>
     </bean>
 
+    <bean id="resultPresenter" class="ru.otus.study.spring.service.TestResultPresenterImpl">
+        <constructor-arg name="ioService" ref="ioService"/>
+    </bean>
     <bean id="askService" class="ru.otus.study.spring.service.StudentInfoAskServiceImpl">
-        <constructor-arg name="dataReaderService" ref="dataReader"/>
+        <constructor-arg name="ioService" ref="ioService"/>
     </bean>
 
     <bean id="interactionService" class="ru.otus.study.spring.service.UserInteractionServiceImpl">
         <constructor-arg name="taskDao" ref="taskDao"/>
-        <constructor-arg name="dataReaderService" ref="dataReader"/>
+        <constructor-arg name="ioService" ref="ioService"/>
     </bean>
     <bean id="checkService" class="ru.otus.study.spring.service.TaskCheckServiceImpl">
         <constructor-arg name="taskDao" ref="taskDao"/>
@@ -27,5 +28,11 @@
         <constructor-arg name="taskDao" ref="taskDao"/>
         <constructor-arg name="interactionService" ref="interactionService"/>
     </bean>
+    <bean id="appRunner" class="ru.otus.study.spring.service.AppRunnerImpl">
+        <constructor-arg name="testService" ref="testingService"/>
+        <constructor-arg name="checkService" ref="checkService"/>
+        <constructor-arg name="studentInfoAskService" ref="askService"/>
+    </bean>
+
 
 </beans>
