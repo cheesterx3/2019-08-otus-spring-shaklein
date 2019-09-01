@@ -28,7 +28,7 @@ public class UserInteractionServiceImpl implements UserInteractionService {
 
     @Override
     public void greetUser() {
-       ioService.printOutput("Добро пожаловать в тест. Для выбора ответа вводите его номер. Для выбора нескольких вариантов, вводите их через пробел.");
+        ioService.printOutput("Добро пожаловать в тест. Для выбора ответа вводите его номер. Для выбора нескольких вариантов, вводите их через пробел.");
     }
 
     private Map<Integer, Answer> showQuestionAndGetAnswerVariants(StudentTask studentTask) {
@@ -47,61 +47,28 @@ public class UserInteractionServiceImpl implements UserInteractionService {
 
     private Set<Answer> readStudentAnswers(Map<Integer, Answer> answers) {
         final Set<Answer> answersList = new HashSet<>();
-        List<Integer> answerIndexes = tryReadAnswer(answers.size());
+        List<Integer> answerIndexes = tryReadAnswerAndGetIndexes(answers.size());
         answerIndexes.forEach(index -> answersList.add(answers.get(index)));
         return answersList;
     }
 
-    private List<Integer> tryReadAnswer(int maxAnswerIndex) {
-        String answer;
-        if ((answer = ioService.getUserInput()) != null) {
-            final List<Integer> indexList = tryParseInt(maxAnswerIndex, answer);
-            if (!indexList.isEmpty())
-                return indexList;
-            return repeatAnswerReading(maxAnswerIndex);
-        } else {
+    private List<Integer> tryReadAnswerAndGetIndexes(int maxAnswerIndex) {
+        final List<Integer> indexList = tryParseToReadAnswerIndexes(maxAnswerIndex);
+        if (indexList.isEmpty()) {
             return repeatAnswerReading(maxAnswerIndex);
         }
-    }
-
-    private List<Integer> tryParseInt(int maxAnswerIndex, String answer) {
-        return new UserInputParser(answer, maxAnswerIndex).parseList();
+        return indexList;
     }
 
     private List<Integer> repeatAnswerReading(int maxAnswerIndex) {
         ioService.printOutput("Вы не выбрали вариант ответа. Повторите выбор.");
-        return tryReadAnswer(maxAnswerIndex);
+        return tryReadAnswerAndGetIndexes(maxAnswerIndex);
     }
 
-    private static class UserInputParser {
-        private final Scanner scanner;
-        private final int maxAnswerIndex;
-        private final List<Integer> indexList = new ArrayList<>();
-
-        private UserInputParser(String userInput, int maxAnswerIndex) {
-            this.maxAnswerIndex = maxAnswerIndex;
-            scanner = new Scanner(userInput);
-        }
-
-        List<Integer> parseList() {
-            try {
-                if (scanner.hasNextInt()) {
-                    tryToAddIndexToList();
-                    while (scanner.hasNextInt()) {
-                        tryToAddIndexToList();
-                    }
-                }
-            } finally {
-                scanner.close();
-            }
-            return indexList;
-        }
-
-        private void tryToAddIndexToList() {
-            int ansIndex = scanner.nextInt();
-            if (ansIndex > 0 && ansIndex <= maxAnswerIndex) {
-                indexList.add(ansIndex);
-            }
-        }
+    private List<Integer> tryParseToReadAnswerIndexes(int maxAnswerIndex) {
+        List<Integer> indexList = ioService.tryToReadIntValues();
+        indexList.removeIf(index -> index <= 0 || index > maxAnswerIndex);
+        return indexList;
     }
+
 }
