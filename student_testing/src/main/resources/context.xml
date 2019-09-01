@@ -3,7 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="ioService" class="ru.otus.study.spring.service.IOServiceImpl"/>
+    <bean id="ioProvider" class="ru.otus.study.spring.service.IOProviderImpl"/>
+    <bean id="ioService" class="ru.otus.study.spring.service.IOServiceImpl">
+        <constructor-arg name="ioProvider" ref="ioProvider"/>
+    </bean>
 
     <bean id="taskDao" class="ru.otus.study.spring.dao.TaskDaoImpl">
         <constructor-arg name="dataUrl" value="/data.csv"/>
