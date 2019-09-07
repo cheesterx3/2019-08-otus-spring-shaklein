@@ -1,5 +1,7 @@
 package ru.otus.study.spring.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.otus.study.spring.dao.TaskDao;
 import ru.otus.study.spring.domain.StudentAnswer;
 import ru.otus.study.spring.domain.StudentTask;
@@ -9,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Service
 public class TestingServiceImpl implements TestingService {
     private final List<StudentAnswer> answers = new ArrayList<>();
     private final TaskDao taskDao;

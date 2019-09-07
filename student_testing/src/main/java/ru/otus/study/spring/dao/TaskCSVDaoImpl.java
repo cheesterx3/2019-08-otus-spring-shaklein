@@ -13,14 +13,14 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 
-public class TaskDaoImpl implements TaskDao {
+public class TaskCSVDaoImpl implements TaskDao {
     private final static String CORRECT_POSTFIX = "#correct";
-    private final String dataUrl;
+    private final InputStream dataStream;
     private final Map<StudentTask, List<Answer>> tasks = new HashMap<>();
     private final Map<StudentTask, List<Answer>> taskCorrectAnswersMapping = new HashMap<>();
 
-    public TaskDaoImpl(String dataUrl) {
-        this.dataUrl = dataUrl;
+    public TaskCSVDaoImpl(InputStream dataStream) {
+        this.dataStream = dataStream;
         try {
             readDataFromCsvResource();
         } catch (IOException e) {
@@ -29,9 +29,8 @@ public class TaskDaoImpl implements TaskDao {
     }
 
     private void readDataFromCsvResource() throws IOException {
-        final InputStream stream = getClass().getResourceAsStream(dataUrl);
         CSVParser parser = new CSVParserBuilder().withSeparator('|').build();
-        try (CSVReader reader = new CSVReaderBuilder(new InputStreamReader(stream)).withCSVParser(parser).build()) {
+        try (CSVReader reader = new CSVReaderBuilder(new InputStreamReader(dataStream)).withCSVParser(parser).build()) {
             List<String[]> data = reader.readAll();
             for (String[] line : data) {
                 CsvDataParser csvDataParser = new CsvDataParser(line).invoke();

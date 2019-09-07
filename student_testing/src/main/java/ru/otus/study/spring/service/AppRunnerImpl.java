@@ -1,10 +1,13 @@
 package ru.otus.study.spring.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.otus.study.spring.domain.StudentAnswer;
 import ru.otus.study.spring.domain.StudentNameInfo;
 
 import java.util.List;
 
+@Service
 public class AppRunnerImpl implements AppRunner {
     private final TestingService testService;
     private final TaskCheckService checkService;

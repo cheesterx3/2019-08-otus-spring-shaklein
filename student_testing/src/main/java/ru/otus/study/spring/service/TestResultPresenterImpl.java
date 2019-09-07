@@ -1,19 +1,30 @@
 package ru.otus.study.spring.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import ru.otus.study.spring.domain.StudentNameInfo;
+import ru.otus.study.spring.service.i18n.LocalizationService;
 
-import java.text.MessageFormat;
-
+@Service
 public class TestResultPresenterImpl implements TestResultPresenter {
-    private final IOService ioService;
+    private final static String APPEAL_MSG = "message.appeal";
 
-    public TestResultPresenterImpl(IOService ioService) {
+    private final IOService ioService;
+    private final LocalizationService localizationService;
+
+    public TestResultPresenterImpl(IOService ioService,
+                                   @Qualifier("messageLocalizationService") LocalizationService localizationService) {
         this.ioService = ioService;
+        this.localizationService = localizationService;
     }
 
     @Override
     public void showResults(StudentNameInfo studentNameInfo, String testResults) {
-        ioService.printOutput(MessageFormat.format("Dear {0}", studentNameInfo.getName()));
+        ioService.printOutput(getAppealMessage(studentNameInfo));
         ioService.printOutput(testResults);
+    }
+
+    private String getAppealMessage(StudentNameInfo studentNameInfo) {
+        return localizationService.getLocalized(APPEAL_MSG, new String[]{studentNameInfo.getName()});
     }
 }
