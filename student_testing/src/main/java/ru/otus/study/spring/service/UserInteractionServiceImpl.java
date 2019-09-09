@@ -33,6 +33,7 @@ public class UserInteractionServiceImpl implements UserInteractionService {
     public StudentAnswer askTask(StudentTask studentTask) {
         final Map<Integer, Answer> taskAnswers = showQuestionAndGetAnswerVariants(studentTask);
         if (!taskAnswers.isEmpty()) {
+            ioService.printOutput(studentTask.getQuestion());
             showAnswers(taskAnswers);
             Set<Answer> answeredList = readStudentAnswers(taskAnswers);
             return new StudentAnswer(studentTask, answeredList);
@@ -47,7 +48,6 @@ public class UserInteractionServiceImpl implements UserInteractionService {
 
     private Map<Integer, Answer> showQuestionAndGetAnswerVariants(StudentTask studentTask) {
         List<Answer> answerList = taskDao.getAnswerVariants(studentTask);
-        ioService.printOutput(studentTask.getQuestion());
         return convertAnswersListToMap(answerList);
     }
 

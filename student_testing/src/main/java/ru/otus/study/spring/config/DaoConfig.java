@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.otus.study.spring.dao.TaskDao;
 import ru.otus.study.spring.dao.TaskCSVDaoImpl;
+import ru.otus.study.spring.service.DataUrlCreator;
 
 import java.io.InputStream;
 import java.util.Objects;
@@ -14,25 +15,9 @@ import java.util.Objects;
 public class DaoConfig {
 
     @Bean
-    public TaskDao taskDao(@Value("${data.file}") String dataUrl, @Value("${app.locale}") String locale) {
-        InputStream dataStream = getDataStream(dataUrl, locale);
+    public TaskDao taskDao(DataUrlCreator urlCreator) {
+        InputStream dataStream = getResourceAsStream(urlCreator.createDaoURL());
         return new TaskCSVDaoImpl(dataStream);
-    }
-
-    private InputStream getDataStream(@Value("${data.file}") String dataUrl, @Value("${app.locale}") String locale) {
-        String url = createUrlForLocale(dataUrl, locale);
-        InputStream dataStream = getResourceAsStream(url);
-        if (Objects.isNull(dataStream)) {
-            dataStream = getResourceAsStream(dataUrl.concat(".csv"));
-        }
-        return dataStream;
-    }
-
-    private String createUrlForLocale(@Value("${data.file}") String dataUrl, @Value("${app.locale}") String locale) {
-        return dataUrl
-                .concat("_")
-                .concat(locale.replaceAll("-", "_"))
-                .concat(".csv");
     }
 
     private InputStream getResourceAsStream(String url) {
