@@ -52,7 +52,6 @@ class UserInteractionServiceImplTest {
         verify(ioService,times(1)).printOutput(task.getQuestion());
         verify(ioService,times(1)).printOutput(MessageFormat.format("\t{0}. {1}", 1, firstTaskAnswers.get(0).getContent()));
         verify(ioService,times(1)).printOutput(MessageFormat.format("\t{0}. {1}", 2, firstTaskAnswers.get(1).getContent()));
-        verify(ioService,times(1)).tryToReadIntValues();
     }
 
     @Test
@@ -72,11 +71,7 @@ class UserInteractionServiceImplTest {
         given(taskDao.getAnswerVariants(task)).willReturn(firstTaskAnswers);
         given(ioService.tryToReadIntValues()).willReturn(new ArrayList<>(),Arrays.asList(1));
         interactionService.askTask(task);
-        verify(ioService,times(1)).printOutput(task.getQuestion());
-        verify(ioService,times(1)).printOutput(MessageFormat.format("\t{0}. {1}", 1, firstTaskAnswers.get(0).getContent()));
-        verify(ioService,times(1)).printOutput(MessageFormat.format("\t{0}. {1}", 2, firstTaskAnswers.get(1).getContent()));
         verify(ioService,times(1)).printOutput("RESELECT");
-        verify(ioService,times(2)).tryToReadIntValues();
     }
 
     @Test
@@ -89,10 +84,6 @@ class UserInteractionServiceImplTest {
         given(taskDao.getAnswerVariants(task)).willReturn(firstTaskAnswers);
         given(ioService.tryToReadIntValues()).willReturn(list,Arrays.asList(1));
         interactionService.askTask(task);
-        verify(ioService,times(1)).printOutput(task.getQuestion());
-        verify(ioService,times(1)).printOutput(MessageFormat.format("\t{0}. {1}", 1, firstTaskAnswers.get(0).getContent()));
-        verify(ioService,times(1)).printOutput(MessageFormat.format("\t{0}. {1}", 2, firstTaskAnswers.get(1).getContent()));
-        verify(ioService,times(2)).tryToReadIntValues();
         verify(ioService,times(1)).printOutput("RESELECT");
     }
 
