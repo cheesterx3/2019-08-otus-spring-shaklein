@@ -14,7 +14,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     private final String langTag;
     private final MessageSource messageSource;
 
-    LocalizationServiceImpl(String langTag, MessageSource messageSource) {
+    LocalizationServiceImpl(@Value("${app.locale}") String langTag, MessageSource messageSource) {
         this.langTag = langTag;
         this.messageSource = messageSource;
     }
