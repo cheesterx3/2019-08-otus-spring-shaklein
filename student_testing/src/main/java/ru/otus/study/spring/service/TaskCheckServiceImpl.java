@@ -1,22 +1,31 @@
 package ru.otus.study.spring.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import ru.otus.study.spring.dao.TaskDao;
 import ru.otus.study.spring.domain.*;
+import ru.otus.study.spring.service.i18n.LocalizationService;
 
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Service
 public class TaskCheckServiceImpl implements TaskCheckService {
+    private final static String TEST_RESULT_MSG="message.testresult";
+
     private final TestResultPresenter resultPresenter;
     private final TaskDao taskDao;
+    private final LocalizationService localizationService;
 
-    public TaskCheckServiceImpl(TestResultPresenter resultPresenter, TaskDao taskDao) {
+
+    public TaskCheckServiceImpl(TestResultPresenter resultPresenter,
+                                TaskDao taskDao,
+                                @Qualifier("messageLocalizationService") LocalizationService localizationService) {
         this.resultPresenter = resultPresenter;
         this.taskDao = taskDao;
-
+        this.localizationService = localizationService;
     }
 
     @Override
@@ -25,7 +34,11 @@ public class TaskCheckServiceImpl implements TaskCheckService {
         for (StudentAnswer answer : answers) {
             if (checkTask(answer)) correctTasks++;
         }
-        resultPresenter.showResults(studentNameInfo, MessageFormat.format("You have answered correctly on {0} questions", correctTasks));
+        resultPresenter.showResults(studentNameInfo, getResultMessage(correctTasks));
+    }
+
+    private String getResultMessage(int correctTasks) {
+        return localizationService.getLocalized(TEST_RESULT_MSG,new Integer[]{correctTasks});
     }
 
     private boolean checkTask(StudentAnswer studentAnswer) {

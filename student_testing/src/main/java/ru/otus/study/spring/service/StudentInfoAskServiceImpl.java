@@ -1,12 +1,22 @@
 package ru.otus.study.spring.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import ru.otus.study.spring.domain.StudentNameInfo;
+import ru.otus.study.spring.service.i18n.LocalizationService;
 
+import java.util.Objects;
+
+@Service
 public class StudentInfoAskServiceImpl implements StudentInfoAskService {
+    public final static String ASK_NAME_MSG = "message.username";
     private final IOService ioService;
+    private final LocalizationService localizationService;
 
-    public StudentInfoAskServiceImpl(IOService ioService) {
+    public StudentInfoAskServiceImpl(IOService ioService,
+                                     @Qualifier("messageLocalizationService") LocalizationService localizationService) {
         this.ioService = ioService;
+        this.localizationService = localizationService;
     }
 
     @Override
@@ -15,13 +25,19 @@ public class StudentInfoAskServiceImpl implements StudentInfoAskService {
     }
 
     private String tryReadStudentName() {
-        ioService.printOutput("Введите своё имя, пожалуйста.");
-        String name;
-        if ((name = ioService.getUserInput()) != null) {
-            return name.trim().isEmpty() ? tryReadStudentName() : name;
-        } else {
-            return tryReadStudentName();
+        askStudentName();
+        String name = ioService.getUserInput();
+        if (isNameCorrect(name)) {
+            return name;
         }
+        return tryReadStudentName();
+    }
 
+    private void askStudentName() {
+        ioService.printOutput(localizationService.getLocalized(ASK_NAME_MSG));
+    }
+
+    private boolean isNameCorrect(String name) {
+        return Objects.nonNull(name) && !name.trim().isEmpty();
     }
 }
