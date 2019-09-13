@@ -4,6 +4,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import ru.otus.study.spring.domain.Answer;
 import ru.otus.study.spring.domain.StudentTask;
@@ -14,7 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-@Service
+@Repository
 public class TaskCSVDaoImpl implements TaskDao {
     private final static String CORRECT_POSTFIX = "#correct";
     private final InputStream dataStream;
