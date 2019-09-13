@@ -4,6 +4,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import org.springframework.stereotype.Service;
 import ru.otus.study.spring.domain.Answer;
 import ru.otus.study.spring.domain.StudentTask;
 import ru.otus.study.spring.service.DataUrlCreator;
@@ -13,22 +14,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-
+@Service
 public class TaskCSVDaoImpl implements TaskDao {
     private final static String CORRECT_POSTFIX = "#correct";
     private final InputStream dataStream;
-    private final DataUrlCreator urlCreator;
     private final Map<StudentTask, List<Answer>> tasks = new HashMap<>();
     private final Map<StudentTask, List<Answer>> taskCorrectAnswersMapping = new HashMap<>();
 
-    public TaskCSVDaoImpl(InputStream dataStream, DataUrlCreator urlCreator) {
-        this.dataStream = dataStream;
-        this.urlCreator = urlCreator;
+    public TaskCSVDaoImpl(DataUrlCreator urlCreator) {
+        this.dataStream = getResourceAsStream(urlCreator.createDaoURL());
         try {
             readDataFromCsvResource();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private InputStream getResourceAsStream(String url) {
+        return getClass().getResourceAsStream("/" + url);
     }
 
     private void readDataFromCsvResource() throws IOException {

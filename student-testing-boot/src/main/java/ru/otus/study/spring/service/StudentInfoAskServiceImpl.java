@@ -9,7 +9,8 @@ import java.util.Objects;
 
 @Service
 public class StudentInfoAskServiceImpl implements StudentInfoAskService {
-    public final static String ASK_NAME_MSG = "message.username";
+    final static String ASK_NAME_MSG = "message.username";
+
     private final IOService ioService;
     private final LocalizationService localizationService;
 

@@ -23,6 +23,7 @@ public class TestingServiceImpl implements TestingService {
     }
 
     public List<StudentAnswer> processTestingAndGetReadOnlyResults() {
+        answers.clear();
         interactionService.greetUser();
         List<StudentTask> studentTasks = taskDao.getTasks();
         studentTasks.forEach(this::askTask);
