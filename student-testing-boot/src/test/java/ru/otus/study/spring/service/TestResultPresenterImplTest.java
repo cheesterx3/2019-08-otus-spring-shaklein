@@ -10,8 +10,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.study.spring.domain.StudentNameInfo;
 import ru.otus.study.spring.service.i18n.LocalizationService;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

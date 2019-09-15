@@ -1,6 +1,5 @@
 package ru.otus.study.spring.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.otus.study.spring.dao.TaskDao;
 import ru.otus.study.spring.domain.StudentAnswer;
@@ -29,6 +28,7 @@ public class TestingServiceImpl implements TestingService {
         studentTasks.forEach(this::askTask);
         return Collections.unmodifiableList(answers);
     }
+
 
     private void askTask(StudentTask studentTask) {
         StudentAnswer answer = interactionService.askTask(studentTask);

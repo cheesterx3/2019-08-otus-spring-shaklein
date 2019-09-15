@@ -1,0 +1,6 @@
+application:
+  data-url: data
+  locale: en-EN
+spring:
+  messages:
+    basename: "i18n/message"
