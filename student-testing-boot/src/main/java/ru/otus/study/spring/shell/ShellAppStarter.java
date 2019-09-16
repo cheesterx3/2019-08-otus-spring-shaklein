@@ -10,7 +10,6 @@ import ru.otus.study.spring.domain.StudentNameInfo;
 import ru.otus.study.spring.service.AppGreeterService;
 import ru.otus.study.spring.service.AppRunner;
 import ru.otus.study.spring.service.IOService;
-import ru.otus.study.spring.service.TestingService;
 import ru.otus.study.spring.service.i18n.LocalizationService;
 
 @ShellComponent
@@ -20,9 +19,7 @@ public class ShellAppStarter implements AppGreeterService {
     private final LocalizationService localizationService;
     private boolean isTestFinished;
 
-    public ShellAppStarter(AppRunner appRunner, IOService ioService,
-                           LocalizationService localizationService,
-                           TestingService testingService) {
+    public ShellAppStarter(AppRunner appRunner, IOService ioService, LocalizationService localizationService) {
         this.appRunner = appRunner;
         this.ioService = ioService;
         this.localizationService = localizationService;
