@@ -1,8 +1,6 @@
 package ru.otus.study.spring.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import ru.otus.study.spring.config.ApplicationProperties;
 
 @Component

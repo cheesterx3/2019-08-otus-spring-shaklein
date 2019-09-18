@@ -21,8 +21,8 @@ import static org.mockito.Mockito.verify;
 @DisplayName("Методы сервиса запроса имени студента ")
 @SpringBootTest(classes = StudentInfoAskServiceImpl.class)
 class StudentInfoAskServiceImplTest {
-    private final static String USER_NAME="Иванов";
-    private final static String GREETING="Введите имя";
+    private final static String USER_NAME = "Иванов";
+    private final static String GREETING = "Введите имя";
 
     @MockBean
     private IOService ioService;
@@ -44,20 +44,20 @@ class StudentInfoAskServiceImplTest {
     @DisplayName("выдать запрос на ввод имени пользователя. ")
     void askUserToInputName() {
         service.getStudentInfo();
-        verify(ioService,times(1)).printOutput(GREETING);
+        verify(ioService, times(1)).printOutput(GREETING);
     }
 
     @Test
     @DisplayName("создать not null экземпляр класса StudentNameInfo")
     void createStudentInfoIsNotNull() {
-        final StudentNameInfo studentNameInfo=service.getStudentInfo();
+        final StudentNameInfo studentNameInfo = service.getStudentInfo();
         assertNotNull(studentNameInfo);
     }
 
     @Test
     @DisplayName("создать экземпляр класса StudentNameInfo по введённым пользователем данным.")
     void createStudentInfo() {
-        final StudentNameInfo studentNameInfo=service.getStudentInfo();
-        assertEquals(studentNameInfo.getName(),USER_NAME);
+        final StudentNameInfo studentNameInfo = service.getStudentInfo();
+        assertEquals(studentNameInfo.getName(), USER_NAME);
     }
 }

@@ -3,17 +3,18 @@ package ru.otus.study.spring.service;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.otus.study.spring.dao.TaskDao;
-import ru.otus.study.spring.domain.*;
+import ru.otus.study.spring.domain.Answer;
+import ru.otus.study.spring.domain.StudentAnswer;
+import ru.otus.study.spring.domain.StudentNameInfo;
 import ru.otus.study.spring.service.i18n.LocalizationService;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 @Service
 public class TaskCheckServiceImpl implements TaskCheckService {
-    private final static String TEST_RESULT_MSG="message.testresult";
+    private final static String TEST_RESULT_MSG = "message.testresult";
 
     private final TestResultPresenter resultPresenter;
     private final TaskDao taskDao;
@@ -38,16 +39,16 @@ public class TaskCheckServiceImpl implements TaskCheckService {
     }
 
     private String getResultMessage(int correctTasks) {
-        return localizationService.getLocalized(TEST_RESULT_MSG,new Integer[]{correctTasks});
+        return localizationService.getLocalized(TEST_RESULT_MSG, new Integer[]{correctTasks});
     }
 
     private boolean checkTask(StudentAnswer studentAnswer) {
         List<Answer> correctAnswers = taskDao.getCorrectAnswers(studentAnswer.getStudentTask());
-        return answersAreSame(correctAnswers,studentAnswer.getReadOnlyAnswers());
+        return answersAreSame(correctAnswers, studentAnswer.getReadOnlyAnswers());
     }
 
     private boolean answersAreSame(Collection<Answer> answersToCheck, Collection<Answer> sourceAnswers) {
-        if (Objects.isNull(answersToCheck)||Objects.isNull(sourceAnswers))
+        if (Objects.isNull(answersToCheck) || Objects.isNull(sourceAnswers))
             return false;
         return sourceAnswers.size() == answersToCheck.size() && sourceAnswers.containsAll(answersToCheck);
     }

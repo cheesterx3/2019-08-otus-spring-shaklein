@@ -5,5 +5,6 @@ import ru.otus.study.spring.domain.StudentTask;
 
 public interface UserInteractionService {
     StudentAnswer askTask(StudentTask studentTask);
+
     void greetUser();
 }

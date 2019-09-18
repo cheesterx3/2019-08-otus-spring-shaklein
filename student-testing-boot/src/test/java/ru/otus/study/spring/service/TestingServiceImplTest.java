@@ -51,20 +51,20 @@ class TestingServiceImplTest {
     @DisplayName("вывести список вопросов из taskDao. Метод processTestingAndGetReadOnlyResults")
     void processTestingAndAskTasks() {
         testingService.processTestingAndGetReadOnlyResults();
-        verify(interactionService,times(2)).askTask(any());
+        verify(interactionService, times(2)).askTask(any());
     }
 
     @Test
     @DisplayName("получить not null список ответов. Метод processTestingAndGetReadOnlyResults")
     void processTestingAndReceiveAnswersNotNull() {
-        final List<StudentAnswer> answers=testingService.processTestingAndGetReadOnlyResults();
+        final List<StudentAnswer> answers = testingService.processTestingAndGetReadOnlyResults();
         assertNotNull(answers);
     }
 
     @Test
     @DisplayName("получить список наборов ответов, соответствующий кол-ву вопросов. Метод processTestingAndGetReadOnlyResults")
     void processTestingAndReceiveAnswersCorrectCount() {
-        final List<StudentAnswer> answers=testingService.processTestingAndGetReadOnlyResults();
-        assertEquals(taskList.size(),answers.size());
+        final List<StudentAnswer> answers = testingService.processTestingAndGetReadOnlyResults();
+        assertEquals(taskList.size(), answers.size());
     }
 }
