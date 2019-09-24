@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Import;
 import ru.otus.study.spring.librarydao.model.Author;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Репозиторий работы с авторами на основе Jdbc ")
 @JdbcTest
@@ -32,15 +32,15 @@ class AuthorRepositoryJdbcImplTest {
     @Test
     @DisplayName(" должен возвращать автора по его идентификатору")
     void getExistingById() {
-        final Author author = repositoryJdbc.getById(2);
-        assertThat(author).isNotNull().matches(a -> a.getName().equals("Author2"));
+        final Optional<Author> author = repositoryJdbc.getById(2);
+        assertThat(author).isNotEmpty().matches(a -> a.get().getName().equals("Author2"));
     }
 
     @Test
-    @DisplayName(" должен возвращать null в случае запроса по идентификатору при его отсутствии")
+    @DisplayName(" должен возвращать пустой optional в случае запроса по идентификатору при его отсутствии")
     void getMissingById() {
-        final Author author = repositoryJdbc.getById(6);
-        assertThat(author).isNull();
+        final Optional<Author> author = repositoryJdbc.getById(6);
+        assertThat(author).isEmpty();
     }
 
     @Test

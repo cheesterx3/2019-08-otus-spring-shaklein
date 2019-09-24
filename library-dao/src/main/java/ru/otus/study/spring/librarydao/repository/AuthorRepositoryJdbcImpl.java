@@ -7,20 +7,22 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.study.spring.librarydao.model.Author;
+import ru.otus.study.spring.librarydao.repository.mapper.AuthorMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class AuthorRepositoryJdbcImpl implements AuthorRepository {
     private final JdbcOperations jdbc;
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
 
-    public AuthorRepositoryJdbcImpl(JdbcOperations jdbc, NamedParameterJdbcOperations namedParameterJdbcOperations) {
-        this.jdbc = jdbc;
+    public AuthorRepositoryJdbcImpl(NamedParameterJdbcOperations namedParameterJdbcOperations) {
+        this.jdbc = namedParameterJdbcOperations.getJdbcOperations();
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
     }
 
@@ -31,13 +33,15 @@ public class AuthorRepositoryJdbcImpl implements AuthorRepository {
     }
 
     @Override
-    public Author getById(long id) {
+    public Optional<Author> getById(long id) {
+        Author author;
         Map<String, Object> params = Collections.singletonMap("id", id);
         try {
-            return namedParameterJdbcOperations.queryForObject("select * from author where id = :id", params, new AuthorMapper());
+            author = namedParameterJdbcOperations.queryForObject("select * from author where id = :id", params, new AuthorMapper());
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            author = null;
         }
+        return Optional.ofNullable(author);
     }
 
     @Override

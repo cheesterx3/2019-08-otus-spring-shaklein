@@ -1,10 +1,7 @@
 package ru.otus.study.spring.librarydao.repository;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -12,10 +9,9 @@ import org.springframework.stereotype.Repository;
 import ru.otus.study.spring.librarydao.model.Author;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.Genre;
+import ru.otus.study.spring.librarydao.repository.mapper.*;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
@@ -26,8 +22,8 @@ public class BookRepositoryJdbcImpl implements BookRepository {
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
 
-    public BookRepositoryJdbcImpl(JdbcOperations jdbc, NamedParameterJdbcOperations namedParameterJdbcOperations, AuthorRepository authorRepository, GenreRepository genreRepository) {
-        this.jdbc = jdbc;
+    public BookRepositoryJdbcImpl(NamedParameterJdbcOperations namedParameterJdbcOperations, AuthorRepository authorRepository, GenreRepository genreRepository) {
+        this.jdbc = namedParameterJdbcOperations.getJdbcOperations();
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
         this.authorRepository = authorRepository;
         this.genreRepository = genreRepository;
@@ -39,17 +35,18 @@ public class BookRepositoryJdbcImpl implements BookRepository {
     }
 
     @Override
-    public Book getById(long id) {
+    public Optional<Book> getById(long id) {
+        Book book;
         final Map<String, Object> params = Collections.singletonMap("id", id);
         try {
-            final Book book = namedParameterJdbcOperations.queryForObject("select * from book where id = :id", params, new BookMapper());
+            book = namedParameterJdbcOperations.queryForObject("select * from book where id = :id", params, new BookMapper());
             if (Objects.nonNull(book)) {
                 fillBookDetails(id, book);
             }
-            return book;
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            book = null;
         }
+        return Optional.ofNullable(book);
     }
 
     private void fillBookDetails(long id, Book book) {
@@ -99,8 +96,8 @@ public class BookRepositoryJdbcImpl implements BookRepository {
 
     @Override
     public Book insert(String bookName, Author author, Genre genre) {
-        Objects.requireNonNull(author,"Author cannot be null");
-        Objects.requireNonNull(genre,"Genre cannot be null");
+        Objects.requireNonNull(author, "Author cannot be null");
+        Objects.requireNonNull(genre, "Genre cannot be null");
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
@@ -138,47 +135,6 @@ public class BookRepositoryJdbcImpl implements BookRepository {
         params.put("bookId", bookId);
         params.put("authorId", authorId);
         namedParameterJdbcOperations.update("insert into ref_book_author (book_id,author_id) values(:bookId,:authorId)", params);
-    }
-
-    private static class BookMapper implements RowMapper<Book> {
-
-        @Override
-        public Book mapRow(ResultSet resultSet, int i) throws SQLException {
-            final Book book = new Book(resultSet.getLong("id"), resultSet.getString("name"));
-            return book;
-        }
-    }
-
-    private static class BookAuthorsExtractor implements ResultSetExtractor<Map<Long, List<Author>>> {
-
-        @Override
-        public Map<Long, List<Author>> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-            final Map<Long, List<Author>> authorMap = new HashMap<>();
-            while (resultSet.next()) {
-                final long book_id = resultSet.getLong("book_id");
-                if (!authorMap.containsKey(book_id)) {
-                    authorMap.put(book_id, new ArrayList<>());
-                }
-                authorMap.get(book_id).add(new Author(resultSet.getLong("id"), resultSet.getString("name")));
-            }
-            return authorMap;
-        }
-    }
-
-    private static class BookGenresExtractor implements ResultSetExtractor<Map<Long, List<Genre>>> {
-
-        @Override
-        public Map<Long, List<Genre>> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-            final Map<Long, List<Genre>> genreMap = new HashMap<>();
-            while (resultSet.next()) {
-                final long book_id = resultSet.getLong("book_id");
-                if (!genreMap.containsKey(book_id)) {
-                    genreMap.put(book_id, new ArrayList<>());
-                }
-                genreMap.get(book_id).add(new Genre(resultSet.getLong("id"), resultSet.getString("name")));
-            }
-            return genreMap;
-        }
     }
 
 }

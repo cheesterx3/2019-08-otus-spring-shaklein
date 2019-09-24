@@ -1,4 +1,4 @@
-package ru.otus.study.spring.librarydao.repository;
+package ru.otus.study.spring.librarydao.repository.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.otus.study.spring.librarydao.model.Genre;
@@ -6,7 +6,7 @@ import ru.otus.study.spring.librarydao.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class GenreMapper implements RowMapper<Genre> {
+public class GenreMapper implements RowMapper<Genre> {
 
     @Override
     public Genre mapRow(ResultSet resultSet, int i) throws SQLException {

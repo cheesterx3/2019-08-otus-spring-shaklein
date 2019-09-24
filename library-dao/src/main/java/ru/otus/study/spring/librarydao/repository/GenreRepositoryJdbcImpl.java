@@ -7,20 +7,22 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.study.spring.librarydao.model.Genre;
+import ru.otus.study.spring.librarydao.repository.mapper.GenreMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class GenreRepositoryJdbcImpl implements GenreRepository {
     private final JdbcOperations jdbc;
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
 
-    public GenreRepositoryJdbcImpl(JdbcOperations jdbc, NamedParameterJdbcOperations namedParameterJdbcOperations) {
-        this.jdbc = jdbc;
+    public GenreRepositoryJdbcImpl(NamedParameterJdbcOperations namedParameterJdbcOperations) {
+        this.jdbc = namedParameterJdbcOperations.getJdbcOperations();
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
     }
 
@@ -31,13 +33,15 @@ public class GenreRepositoryJdbcImpl implements GenreRepository {
     }
 
     @Override
-    public Genre getById(long id) {
+    public Optional<Genre> getById(long id) {
+        Genre genre;
         Map<String, Object> params = Collections.singletonMap("id", id);
         try {
-            return namedParameterJdbcOperations.queryForObject("select * from genre where id = :id", params, new GenreMapper());
+            genre = namedParameterJdbcOperations.queryForObject("select * from genre where id = :id", params, new GenreMapper());
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            genre = null;
         }
+        return Optional.ofNullable(genre);
     }
 
     @Override
@@ -48,7 +52,7 @@ public class GenreRepositoryJdbcImpl implements GenreRepository {
     @Override
     public boolean deleteById(long id) {
         Map<String, Object> params = Collections.singletonMap("id", id);
-        return namedParameterJdbcOperations.update("delete from genre where id = :id", params)==1;
+        return namedParameterJdbcOperations.update("delete from genre where id = :id", params) == 1;
     }
 
     @Override

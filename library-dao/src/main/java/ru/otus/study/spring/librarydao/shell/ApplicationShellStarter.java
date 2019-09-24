@@ -11,7 +11,7 @@ import ru.otus.study.spring.librarydao.repository.BookRepository;
 import ru.otus.study.spring.librarydao.repository.GenreRepository;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @ShellComponent
 public class ApplicationShellStarter {
@@ -42,20 +42,29 @@ public class ApplicationShellStarter {
 
     @ShellMethod(value = "Add new book", key = {"add_book", "ab"})
     public void addBook(@ShellOption(help = "book name") String name, @ShellOption(help = "genre id") long genreId, @ShellOption(help = "author id") long authorId) {
-        final Genre genre = genreRepository.getById(genreId);
-        final Author author = authorRepository.getById(authorId);
-
-        final Book book = bookRepository.insert(name, author, genre);
-        System.out.println("New book was added to database: " + book);
+        final Optional<Genre> genre = genreRepository.getById(genreId);
+        final Optional<Author> author = authorRepository.getById(authorId);
+        if (genre.isPresent() && author.isPresent()) {
+            final Book book = bookRepository.insert(name, author.get(), genre.get());
+            System.out.println("New book was added to database: " + book);
+        } else {
+            System.out.println("Couldn't add new book to database. Cause errors: ");
+            if (!genre.isPresent()) {
+                System.out.println("\tGenre was not found");
+            }
+            if (!author.isPresent()) {
+                System.out.println("\tAuthor was not found");
+            }
+        }
     }
 
     @ShellMethod(value = "Find a book by id", key = {"find_book", "fb"})
     public Book getBookById(@ShellOption(help = "book id") long id) {
-        final Book book = bookRepository.getById(id);
-        if (Objects.isNull(book)) {
+        final Optional<Book> book = bookRepository.getById(id);
+        if (!book.isPresent()) {
             System.out.println("Book with entered id not found");
         }
-        return book;
+        return book.orElse(null);
     }
 
     @ShellMethod(value = "Delete a book by id", key = {"del_book", "db"})

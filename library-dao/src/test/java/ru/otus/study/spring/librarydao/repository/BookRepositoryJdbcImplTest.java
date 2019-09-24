@@ -1,5 +1,6 @@
 package ru.otus.study.spring.librarydao.repository;
 
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.Genre;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,19 +39,19 @@ class BookRepositoryJdbcImplTest {
     @Test
     @DisplayName(" должен возвращать жанр по его идентификатору")
     void getExistingById() {
-        final Book book = repositoryJdbc.getById(2);
+        final Optional<Book> book = repositoryJdbc.getById(2);
         assertThat(book)
-                .isNotNull()
-                .matches(b -> b.getName().equals("Book2"))
-                .matches(b -> b.getGenres().size() > 0)
-                .matches(b -> b.getAuthors().size() > 0);
+                .isNotEmpty()
+                .matches(b -> b.get().getName().equals("Book2"))
+                .matches(b -> b.get().getGenres().size() > 0)
+                .matches(b -> b.get().getAuthors().size() > 0);
     }
 
     @Test
-    @DisplayName(" должен возвращать null в случае запроса по идентификатору при его отсутствии")
+    @DisplayName(" должен возвращать пустой optional в случае запроса по идентификатору при его отсутствии")
     void getMissingById() {
-        final Book book = repositoryJdbc.getById(6);
-        assertThat(book).isNull();
+        final Optional<Book> book = repositoryJdbc.getById(6);
+        assertThat(book).isEmpty();
     }
 
     @Test
@@ -75,17 +77,17 @@ class BookRepositoryJdbcImplTest {
     @DisplayName(" должен корректно добавлять книгу по имени с установленным жанром и автором и возвращать его экземпляр со сгенерированным идентификатором")
     void insertCorrect() {
         final String bookName = "Some book";
-        final Genre genre = genreRepositoryJdbc.getById(1);
-        final Author author = authorRepositoryJdbc.getById(1);
+        final Optional<Genre> genre = genreRepositoryJdbc.getById(1);
+        final Optional<Author> author = authorRepositoryJdbc.getById(1);
 
-        final Book book = repositoryJdbc.insert(bookName, author, genre);
+        final Book book = repositoryJdbc.insert(bookName, author.get(), genre.get());
         final int count = repositoryJdbc.count();
         assertThat(book)
                 .isNotNull()
                 .matches(b -> b.getId() > 0)
                 .matches(b -> b.getName().equals(bookName))
-                .matches(b -> b.getAuthors().contains(author))
-                .matches(b -> b.getGenres().contains(genre));
+                .matches(b -> b.getAuthors().contains(author.get()))
+                .matches(b -> b.getGenres().contains(genre.get()));
         assertThat(count).isEqualTo(EXPECTED_ROW_COUNT + 1);
     }
 

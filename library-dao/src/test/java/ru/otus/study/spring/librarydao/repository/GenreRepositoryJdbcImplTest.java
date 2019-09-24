@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Import;
 import ru.otus.study.spring.librarydao.model.Genre;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Репозиторий работы с жанрами на основе Jdbc ")
 @JdbcTest
@@ -32,15 +32,15 @@ class GenreRepositoryJdbcImplTest {
     @Test
     @DisplayName(" должен возвращать жанр по его идентификатору")
     void getExistingById() {
-        final Genre genre = repositoryJdbc.getById(2);
-        assertThat(genre).isNotNull().matches(g -> g.getName().equals("Genre2"));
+        final Optional<Genre> genre = repositoryJdbc.getById(2);
+        assertThat(genre).isNotEmpty().matches(g -> g.get().getName().equals("Genre2"));
     }
 
     @Test
-    @DisplayName(" должен возвращать null в случае запроса по идентификатору при его отсутствии")
+    @DisplayName(" должен возвращать пустой optional в случае запроса по идентификатору при его отсутствии")
     void getMissingById() {
-        final Genre genre = repositoryJdbc.getById(6);
-        assertThat(genre).isNull();
+        final Optional<Genre> genre = repositoryJdbc.getById(6);
+        assertThat(genre).isEmpty();
     }
 
     @Test

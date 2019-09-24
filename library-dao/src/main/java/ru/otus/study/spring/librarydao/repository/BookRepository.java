@@ -5,11 +5,12 @@ import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.Genre;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository {
     int count();
 
-    Book getById(long id);
+    Optional<Book> getById(long id);
 
     List<Book> getAll();
 
