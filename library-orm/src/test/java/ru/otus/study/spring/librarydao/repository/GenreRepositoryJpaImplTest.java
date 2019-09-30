@@ -9,11 +9,9 @@ import org.springframework.context.annotation.Import;
 import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Genre;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Репозиторий работы с жанрами на основе Jpa ")
 @DataJpaTest
@@ -55,17 +53,18 @@ class GenreRepositoryJpaImplTest {
     @DisplayName(" должен корректно добавлять жанр по имени и возвращать его экземпляр со сгенерированным идентификатором")
     void insert() {
         final String genreName = "Some genre";
-        final GenericDaoResult<Genre> genreInsertResult = genreRepositoryJpa.insert(genreName);
-        assertThat(genreInsertResult.getResult())
-                .isPresent()
-                .matches(g -> g.get().getId() > 0)
-                .matches(g -> g.get().getName().equals(genreName));
-        final Genre actualGenre = em.find(Genre.class, genreInsertResult.getResult().get().getId());
+        final Genre genre = genreRepositoryJpa.insert(genreName);
+        assertThat(genre)
+                .isNotNull()
+                .matches(g -> g.getId() > 0)
+                .matches(g -> g.getName().equals(genreName));
+        final Genre actualGenre = em.find(Genre.class, genre.getId());
         assertThat(actualGenre)
                 .isNotNull()
                 .matches(g -> g.getId() > 0)
                 .matches(g -> g.getName().equals(genreName));
     }
+
 
 
 }

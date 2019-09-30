@@ -30,11 +30,6 @@ public class Book {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Genre> genres;
 
-    @OneToMany(targetEntity = BookComment.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "book_id")
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<BookComment> comments;
-
     public Book() {
     }
 
@@ -42,7 +37,6 @@ public class Book {
         this.name = name;
         authors = new ArrayList<>();
         genres = new ArrayList<>();
-        comments = new ArrayList<>();
     }
 
     public List<Author> getAuthors() {
@@ -74,7 +68,4 @@ public class Book {
         return genres.stream().map(Genre::getName).collect(Collectors.joining(", "));
     }
 
-    public List<BookComment> getComments() {
-        return comments;
-    }
 }

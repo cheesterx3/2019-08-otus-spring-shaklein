@@ -26,6 +26,11 @@ insert into ref_book_genre(book_id,genre_id) values (3,2);
 insert into ref_book_genre(book_id,genre_id) values (4,3);
 insert into ref_book_genre(book_id,genre_id) values (4,2);
 
+insert into comment(id,text,dtime,book_id) values(1,'Test comment',{ts '2019-09-30 10:00:00'},1);
+insert into comment(id,text,dtime,book_id) values(2,'Test comment 2',{ts '2019-09-30 10:01:00'},1);
+insert into comment(id,text,dtime,book_id) values(3,'Test comment 3',{ts '2019-09-30 10:02:00'},1);
+
+
 
 
 

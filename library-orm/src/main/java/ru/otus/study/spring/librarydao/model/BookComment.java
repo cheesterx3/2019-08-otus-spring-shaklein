@@ -14,6 +14,9 @@ public class BookComment {
     private String text;
     @Column(name = "dtime")
     private LocalDateTime time;
+    @OneToOne(targetEntity = Book.class,cascade = CascadeType.ALL)
+    @JoinColumn(name = "book_id")
+    private Book book;
 
     public BookComment() {
     }
@@ -39,5 +42,13 @@ public class BookComment {
     @Override
     public String toString() {
         return String.format("%s: %s", time, text);
+    }
+
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
     }
 }

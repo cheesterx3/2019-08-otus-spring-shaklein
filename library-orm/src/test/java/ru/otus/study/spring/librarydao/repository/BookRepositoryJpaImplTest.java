@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Author;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.Genre;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Репозиторий работы с книгами на основе JPa ")
 @DataJpaTest
@@ -63,12 +62,19 @@ class BookRepositoryJpaImplTest {
     }
 
     @Test
-    @DisplayName(" должен корректно удалять книгу по идентификтору при его наличии и возвращать true")
-    void deleteById() {
-        final boolean deleted = repositoryJpa.deleteById(1);
+    @DisplayName(" должен корректно удалять книгу ")
+    void delete() {
+        final Book book = em.find(Book.class, 1L);
+        repositoryJpa.delete(book);
+        final Book actualBook = em.find(Book.class, 1L);
+        assertThat(actualBook).isNull();
+    }
 
-        assertTrue(deleted);
-
+    @Test
+    @DisplayName(" должен выкидывать исключение при ппоытке удаления null книги ")
+    void deleteNullBook() {
+        final Book book = null;
+        assertThrows(NullPointerException.class, () -> repositoryJpa.delete(book));
     }
 
     @Test
@@ -78,16 +84,15 @@ class BookRepositoryJpaImplTest {
         final Optional<Genre> genre = genreRepositoryJpa.getById(1);
         final Optional<Author> author = authorRepositoryJpa.getById(1);
 
-        final GenericDaoResult<Book> daoResult = repositoryJpa.insert(bookName, author.get(), genre.get().getName());
-        assertThat(daoResult.getResult())
-                .isPresent()
-                .get()
+        final Book book = repositoryJpa.insert(bookName, author.get(), genre.get().getName());
+        assertThat(book)
+                .isNotNull()
                 .matches(b -> b.getId() > 0)
                 .matches(b -> b.getName().equals(bookName))
                 .matches(b -> b.getAuthors().contains(author.get()))
                 .matches(b -> b.getGenres().contains(genre.get()));
-        final Book book = em.find(Book.class, daoResult.getResult().get().getId());
-        assertThat(book).isEqualToComparingFieldByFieldRecursively(daoResult.getResult().get());
+        final Book actualBook = em.find(Book.class, book.getId());
+        assertThat(actualBook).isEqualToComparingFieldByFieldRecursively(actualBook);
     }
 
     @Test
@@ -96,12 +101,8 @@ class BookRepositoryJpaImplTest {
         final String bookName = "Some book";
         final Genre genre = null;
         final Author author = null;
-        final GenericDaoResult<Book> daoResult = repositoryJpa.insert(bookName, author, null);
-        assertThat(daoResult.getResult()).isEmpty();
-        assertThat(daoResult.getError()).isNotNull().isNotEmpty();
+        assertThrows(NullPointerException.class, () -> repositoryJpa.insert(bookName, author, null));
     }
 
-    @Test
-    void commentBook() {
-    }
+
 }

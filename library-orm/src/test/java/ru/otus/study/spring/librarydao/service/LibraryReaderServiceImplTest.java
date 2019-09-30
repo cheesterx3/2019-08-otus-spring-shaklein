@@ -7,8 +7,10 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.BookComment;
+import ru.otus.study.spring.librarydao.repository.BookCommentRepository;
 import ru.otus.study.spring.librarydao.repository.BookRepository;
 
 import java.util.Collections;
@@ -22,7 +24,7 @@ import static org.mockito.BDDMockito.given;
 @SpringBootTest(classes = LibraryReaderServiceImpl.class)
 @DisplayName(" сервис работы с книгами из библиотеки должен ")
 class LibraryReaderServiceImplTest {
-
+    private final static long MISSING_BOOK_ID=10L;
 
     @Mock
     private Book testBook;
@@ -30,6 +32,8 @@ class LibraryReaderServiceImplTest {
     private BookComment testComment;
     @MockBean
     private BookRepository bookRepository;
+    @MockBean
+    private BookCommentRepository bookCommentRepository;
     @Autowired
     private LibraryReaderService libraryReaderService;
 
@@ -37,8 +41,9 @@ class LibraryReaderServiceImplTest {
     void setUp() {
         given(bookRepository.getAll()).willReturn(Collections.singletonList(testBook));
         given(bookRepository.getById(anyLong())).willReturn(Optional.of(testBook));
-        given(testBook.getComments()).willReturn(Collections.singletonList(testComment));
-        given(bookRepository.commentBook(any(),anyString())).willReturn(testComment);
+        given(bookCommentRepository.getBookComments(any())).willReturn(Collections.singletonList(testComment));
+        given(bookCommentRepository.commentBook(any(),anyString())).willReturn(testComment);
+        given(bookRepository.getById(eq(MISSING_BOOK_ID))).willReturn(Optional.empty());
     }
 
     @Test
@@ -65,7 +70,15 @@ class LibraryReaderServiceImplTest {
     @Test
     @DisplayName(" корректно добавлять новый комментарий к книге ")
     void commentBook() {
-        final BookComment bookComment = libraryReaderService.commentBook(1, "some comment");
-        assertThat(bookComment).isNotNull().isEqualTo(testComment);
+        final GenericDaoResult<BookComment> bookComment = libraryReaderService.commentBook(1, "some comment");
+        assertThat(bookComment.getResult()).isPresent().get().isEqualTo(testComment);
+    }
+
+    @Test
+    @DisplayName(" возвращать ошибку при попытке добавить комментарий к несуществующей книге ")
+    void commentMissingBook() {
+        final GenericDaoResult<BookComment> bookComment = libraryReaderService.commentBook(MISSING_BOOK_ID, "some comment");
+        assertThat(bookComment.getResult()).isNotPresent();
+        assertThat(bookComment.getError()).isNotEmpty();
     }
 }

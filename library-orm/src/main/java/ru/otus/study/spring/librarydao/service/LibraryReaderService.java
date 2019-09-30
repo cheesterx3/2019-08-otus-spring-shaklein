@@ -1,5 +1,6 @@
 package ru.otus.study.spring.librarydao.service;
 
+import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.BookComment;
 
@@ -13,5 +14,5 @@ public interface LibraryReaderService {
 
     List<BookComment> getBookComments(long bookId);
 
-    BookComment commentBook(long bookId, String comment);
+    GenericDaoResult<BookComment> commentBook(long bookId, String comment);
 }

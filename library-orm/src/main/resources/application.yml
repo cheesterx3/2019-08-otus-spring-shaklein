@@ -3,7 +3,7 @@ spring:
     url: jdbc:h2:mem:librarydb
     initialization-mode: always
   jpa:
-    show-sql: false
+    show-sql: true
     generate-ddl: false
     hibernate:
       ddl-auto: none

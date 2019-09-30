@@ -8,6 +8,7 @@ import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.repository.AuthorRepository;
 import ru.otus.study.spring.librarydao.repository.BookRepository;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -24,17 +25,23 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
     @Override
     @Transactional
     public GenericDaoResult<Book> addNewBook(String name, long authorId, String genreName) {
+        if (Objects.isNull(genreName)) {
+            return GenericDaoResult.createError("Genre cannot be null");
+        }
         final Optional<Author> author = authorRepository.getById(authorId);
-        if (!author.isPresent()) {
-            return GenericDaoResult.createError("Author not found");
+        if (author.isPresent()) {
+            final Book book = bookRepository.insert(name, author.get(), genreName);
+            return GenericDaoResult.createResult(book);
         } else {
-            return bookRepository.insert(name, author.get(), genreName);
+            return GenericDaoResult.createError("Author not found");
         }
     }
 
     @Override
     @Transactional
     public boolean deleteBook(long bookId) {
-        return bookRepository.deleteById(bookId);
+        final Optional<Book> book = bookRepository.getById(bookId);
+        book.ifPresent(bookRepository::delete);
+        return book.isPresent();
     }
 }

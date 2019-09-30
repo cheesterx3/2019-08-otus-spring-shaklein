@@ -4,7 +4,6 @@ import org.springframework.stereotype.Repository;
 import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Author;
 import ru.otus.study.spring.librarydao.model.Book;
-import ru.otus.study.spring.librarydao.model.BookComment;
 import ru.otus.study.spring.librarydao.model.Genre;
 
 import javax.persistence.EntityManager;
@@ -36,41 +35,24 @@ public class BookRepositoryJpaImpl implements BookRepository {
     }
 
     @Override
-    public boolean deleteById(long id) {
-        final Optional<Book> book = getById(id);
-        book.ifPresent(b -> em.remove(b));
-        return book.isPresent();
+    public void delete(Book book) {
+        Objects.requireNonNull(book, "Book cannot be null");
+        em.remove(book);
     }
 
     @Override
-    public GenericDaoResult<Book> insert(String bookName, Author author, String genreName) {
-        if (Objects.isNull(genreName)) {
-            return GenericDaoResult.createError("Genre name cannot be null");
-        }
-        final GenericDaoResult<Genre> createGenre = findOrCreateGenre(genreName);
-        if (createGenre.getResult().isPresent()) {
-            final Genre genre = createGenre.getResult().get();
-            final Book book = new Book(bookName);
-            em.persist(book);
-            saveBookGenreAndAuthor(author, genre, book);
-            return GenericDaoResult.createResult(book);
-        } else {
-            return GenericDaoResult.createError(createGenre.getError());
-        }
+    public Book insert(String bookName, Author author, String genreName) {
+        Objects.requireNonNull(genreName, "Genre cannot be null");
+        final Genre genre = findOrCreateGenre(genreName);
+        final Book book = new Book(bookName);
+        em.persist(book);
+        saveBookGenreAndAuthor(author, genre, book);
+        return book;
     }
 
-    private GenericDaoResult<Genre> findOrCreateGenre(String genreName) {
+    private Genre findOrCreateGenre(String genreName) {
         final GenericDaoResult<Genre> currentGenre = genreRepository.getByName(genreName);
-
-        if (currentGenre.getResult().isPresent()) {
-            return GenericDaoResult.createResult(currentGenre.getResult().get());
-        } else {
-            final GenericDaoResult<Genre> insertResult = genreRepository.insert(genreName);
-            if (!insertResult.getResult().isPresent()) {
-                return GenericDaoResult.createError(insertResult.getError());
-            }
-            return GenericDaoResult.createResult(insertResult.getResult().get());
-        }
+        return currentGenre.getResult().orElse(genreRepository.insert(genreName));
     }
 
     private void saveBookGenreAndAuthor(Author author, Genre genre, Book book) {
@@ -79,11 +61,5 @@ public class BookRepositoryJpaImpl implements BookRepository {
         em.merge(book);
     }
 
-    @Override
-    public BookComment commentBook(Book book, String comment) {
-        final BookComment bookComment = new BookComment(comment);
-        book.getComments().add(bookComment);
-        em.merge(book);
-        return bookComment;
-    }
+
 }
