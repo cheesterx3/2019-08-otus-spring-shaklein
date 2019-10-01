@@ -1,7 +1,6 @@
 package ru.otus.study.spring.librarydao.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Author;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.Genre;
@@ -41,24 +40,15 @@ public class BookRepositoryJpaImpl implements BookRepository {
     }
 
     @Override
-    public Book insert(String bookName, Author author, String genreName) {
-        Objects.requireNonNull(genreName, "Genre cannot be null");
-        final Genre genre = findOrCreateGenre(genreName);
-        final Book book = new Book(bookName);
-        em.persist(book);
-        saveBookGenreAndAuthor(author, genre, book);
-        return book;
-    }
-
-    private Genre findOrCreateGenre(String genreName) {
-        final GenericDaoResult<Genre> currentGenre = genreRepository.getByName(genreName);
-        return currentGenre.getResult().orElse(genreRepository.insert(genreName));
-    }
-
-    private void saveBookGenreAndAuthor(Author author, Genre genre, Book book) {
+    public Book insert(Book book, Author author, Genre genre) {
+        Objects.requireNonNull(genre, "Genre cannot be null");
+        Objects.requireNonNull(book, "Book cannot be null");
+        Objects.requireNonNull(author, "Author cannot be null");
         book.getGenres().add(genre);
         book.getAuthors().add(author);
-        em.merge(book);
+        em.persist(book);
+
+        return book;
     }
 
 

@@ -7,15 +7,18 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
+import ru.otus.study.spring.librarydao.exception.DaoException;
 import ru.otus.study.spring.librarydao.model.Author;
 import ru.otus.study.spring.librarydao.model.Book;
+import ru.otus.study.spring.librarydao.model.Genre;
 import ru.otus.study.spring.librarydao.repository.AuthorRepository;
 import ru.otus.study.spring.librarydao.repository.BookRepository;
+import ru.otus.study.spring.librarydao.repository.GenreRepository;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -36,11 +39,15 @@ class LibraryStorageServiceImplTest {
     private Author testAuthor;
     @Mock
     private Book testBook;
+    @Mock
+    private Genre testGenre;
 
     @MockBean
     private BookRepository bookRepository;
     @MockBean
     private AuthorRepository authorRepository;
+    @MockBean
+    private GenreRepository genreRepository;
     @Autowired
     private LibraryStorageService libraryStorageService;
 
@@ -48,36 +55,31 @@ class LibraryStorageServiceImplTest {
     void setUp() {
         given(authorRepository.getById(EXISTING_AUTHOR_ID)).willReturn(Optional.of(testAuthor));
         given(authorRepository.getById(MISSING_AUTHOR_ID)).willReturn(Optional.empty());
-        given(bookRepository.insert(anyString(), any(), anyString())).willReturn(testBook);
+        given(genreRepository.getByName(anyString())).willReturn(Optional.of(testGenre));
+        given(bookRepository.insert(any(), any(), any())).willReturn(testBook);
         given(bookRepository.getById(anyLong())).willReturn(Optional.of(testBook));
     }
 
     @Test
     @DisplayName(" корректно добавлять книгу в библиотеку при вводе верных данных")
-    void addNewBookCorrect() {
-        final GenericDaoResult<Book> bookGenericDaoResult = libraryStorageService.addNewBook(BOOK_NAME, EXISTING_AUTHOR_ID, GENRE_NAME);
-        assertThat(bookGenericDaoResult.getResult())
+    void addNewBookCorrect() throws DaoException {
+        final Optional<Book> bookGenericDaoResult = libraryStorageService.addNewBook(BOOK_NAME, EXISTING_AUTHOR_ID, GENRE_NAME);
+        assertThat(bookGenericDaoResult)
                 .isPresent()
                 .get()
                 .isEqualTo(testBook);
     }
 
     @Test
-    @DisplayName(" возвращать ошибку об отстутвии автора добавления книги  в библиотеку при вводе несуществующего автора")
+    @DisplayName(" выкидывать исключение об отстутвии автора добавления книги  в библиотеку при вводе несуществующего автора")
     void addNewBookAuthorInCorrect() {
-        final GenericDaoResult<Book> bookGenericDaoResult = libraryStorageService.addNewBook(BOOK_NAME, MISSING_AUTHOR_ID, GENRE_NAME);
-        assertThat(bookGenericDaoResult.getResult())
-                .isNotPresent();
-        assertThat(bookGenericDaoResult.getError()).isNotEmpty().isEqualTo(AUTHOR_NOT_FOUND_ERROR);
+        assertThrows(DaoException.class,()->libraryStorageService.addNewBook(BOOK_NAME, MISSING_AUTHOR_ID, GENRE_NAME));
     }
 
     @Test
-    @DisplayName(" возвращать ошибку  добавления книги в библиотеку при вводе некорректного жанра")
+    @DisplayName(" выкидывать исключение  добавления книги в библиотеку при вводе некорректного жанра")
     void addNewBookGenreInCorrect() {
-        final GenericDaoResult<Book> bookGenericDaoResult = libraryStorageService.addNewBook(BOOK_NAME, EXISTING_AUTHOR_ID, null);
-        assertThat(bookGenericDaoResult.getResult())
-                .isNotPresent();
-        assertThat(bookGenericDaoResult.getError()).isNotEmpty().isEqualTo(GENRE_CANNOT_BE_NULL);
+        assertThrows(DaoException.class,()->libraryStorageService.addNewBook(BOOK_NAME, EXISTING_AUTHOR_ID, null));
     }
 
     @Test

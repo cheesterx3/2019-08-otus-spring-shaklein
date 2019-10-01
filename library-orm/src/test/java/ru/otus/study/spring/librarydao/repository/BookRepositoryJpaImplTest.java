@@ -83,15 +83,16 @@ class BookRepositoryJpaImplTest {
         final String bookName = "Some book";
         final Optional<Genre> genre = genreRepositoryJpa.getById(1);
         final Optional<Author> author = authorRepositoryJpa.getById(1);
+        final Book book=new Book(bookName);
 
-        final Book book = repositoryJpa.insert(bookName, author.get(), genre.get().getName());
-        assertThat(book)
+        final Book expectedBook = repositoryJpa.insert(book, author.get(), genre.get());
+        assertThat(expectedBook)
                 .isNotNull()
                 .matches(b -> b.getId() > 0)
                 .matches(b -> b.getName().equals(bookName))
                 .matches(b -> b.getAuthors().contains(author.get()))
                 .matches(b -> b.getGenres().contains(genre.get()));
-        final Book actualBook = em.find(Book.class, book.getId());
+        final Book actualBook = em.find(Book.class, expectedBook.getId());
         assertThat(actualBook).isEqualToComparingFieldByFieldRecursively(actualBook);
     }
 
@@ -101,7 +102,7 @@ class BookRepositoryJpaImplTest {
         final String bookName = "Some book";
         final Genre genre = null;
         final Author author = null;
-        assertThrows(NullPointerException.class, () -> repositoryJpa.insert(bookName, author, null));
+        assertThrows(NullPointerException.class, () -> repositoryJpa.insert(new Book(bookName), author, genre));
     }
 
 

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Genre;
 
 import java.util.Optional;
@@ -29,7 +28,7 @@ class GenreRepositoryJpaImplTest {
     @DisplayName(" должен возвращать жанр по его идентификатору")
     void getExistingById() {
         final Optional<Genre> genre = genreRepositoryJpa.getById(2);
-        assertThat(genre).isNotEmpty().matches(g -> g.get().getName().equals("Genre2"));
+        assertThat(genre).isNotEmpty().get().matches(g -> g.getName().equals("Genre2"));
         final Genre expectedGenre = em.find(Genre.class, 2L);
         assertThat(genre).isPresent().get()
                 .isEqualToComparingFieldByFieldRecursively(expectedGenre);
@@ -45,8 +44,8 @@ class GenreRepositoryJpaImplTest {
     @Test
     @DisplayName(" должен возвращать жанр по наименованию")
     void getExistingByName() {
-        final GenericDaoResult<Genre> genreByName = genreRepositoryJpa.getByName(GENRE_NAME_TO_FIND);
-        assertThat(genreByName.getResult()).isNotEmpty().matches(g -> g.get().getName().equals("Genre2"));
+        final Optional<Genre> genreByName = genreRepositoryJpa.getByName(GENRE_NAME_TO_FIND);
+        assertThat(genreByName).isNotEmpty().get().matches(g -> g.getName().equals("Genre2"));
     }
 
     @Test

@@ -3,6 +3,7 @@ package ru.otus.study.spring.librarydao.shell;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import ru.otus.study.spring.librarydao.exception.DaoException;
 import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.BookComment;
@@ -41,20 +42,22 @@ public class ApplicationShellStarter {
 
     @ShellMethod(value = "Add new book", key = {"add_book", "ab"})
     public void addBook(@ShellOption(help = "book name") String name, @ShellOption(help = "genre name") String genreName, @ShellOption(help = "author id") long authorId) {
-        final GenericDaoResult<Book> newBookResult = libraryStorageService.addNewBook(name, authorId, genreName);
-        System.out.println(
-                newBookResult.getResult().map(book -> "New book was added. " + book)
-                        .orElse("Book was not added cause errors:\n\t" + newBookResult.getError())
-        );
+        final Optional<Book> newBookResult;
+        try {
+            newBookResult = libraryStorageService.addNewBook(name, authorId, genreName);
+            newBookResult.ifPresent(book -> System.out.println("New book was added. " + book));
+        } catch (DaoException e) {
+            System.out.println("Book was not added cause of exception. " + e.getMessage());
+        }
     }
 
     @ShellMethod(value = "Add new comment to book", key = {"comment_book", "cb"})
     public BookComment commentBook(@ShellOption(help = "book id") long bookId, @ShellOption(help = "comment text") String comment) {
         final GenericDaoResult<BookComment> commentBook = libraryReaderService.commentBook(bookId, comment);
-        if (!commentBook.getResult().isPresent()) {
+        return commentBook.getResult().orElseGet(() -> {
             System.out.println(commentBook.getError());
-        }
-        return commentBook.getResult().orElse(null);
+            return null;
+        });
     }
 
     @ShellMethod(value = "Find a book by id", key = {"find_book", "fb"})
