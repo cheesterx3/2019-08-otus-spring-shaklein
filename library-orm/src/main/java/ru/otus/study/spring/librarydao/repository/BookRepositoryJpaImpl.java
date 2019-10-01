@@ -1,9 +1,7 @@
 package ru.otus.study.spring.librarydao.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.otus.study.spring.librarydao.model.Author;
 import ru.otus.study.spring.librarydao.model.Book;
-import ru.otus.study.spring.librarydao.model.Genre;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -40,14 +38,9 @@ public class BookRepositoryJpaImpl implements BookRepository {
     }
 
     @Override
-    public Book insert(Book book, Author author, Genre genre) {
-        Objects.requireNonNull(genre, "Genre cannot be null");
+    public Book insert(Book book) {
         Objects.requireNonNull(book, "Book cannot be null");
-        Objects.requireNonNull(author, "Author cannot be null");
-        book.getGenres().add(genre);
-        book.getAuthors().add(author);
         em.persist(book);
-
         return book;
     }
 

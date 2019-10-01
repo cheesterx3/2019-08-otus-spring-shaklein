@@ -15,9 +15,7 @@ public class BookCommentRepositoryJpaImpl implements BookCommentRepository {
     private EntityManager em;
 
     @Override
-    public BookComment commentBook(Book book, String comment) {
-        final BookComment bookComment = new BookComment(comment);
-        bookComment.setBook(book);
+    public BookComment commentBook(BookComment bookComment) {
         em.persist(bookComment);
         return bookComment;
     }

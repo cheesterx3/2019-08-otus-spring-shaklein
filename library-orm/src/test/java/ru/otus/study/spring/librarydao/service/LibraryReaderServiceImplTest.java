@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
+import ru.otus.study.spring.librarydao.exception.DaoException;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.BookComment;
 import ru.otus.study.spring.librarydao.repository.BookCommentRepository;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
@@ -42,7 +43,7 @@ class LibraryReaderServiceImplTest {
         given(bookRepository.getAll()).willReturn(Collections.singletonList(testBook));
         given(bookRepository.getById(anyLong())).willReturn(Optional.of(testBook));
         given(bookCommentRepository.getBookComments(any())).willReturn(Collections.singletonList(testComment));
-        given(bookCommentRepository.commentBook(any(),anyString())).willReturn(testComment);
+        given(bookCommentRepository.commentBook(any())).willReturn(testComment);
         given(bookRepository.getById(eq(MISSING_BOOK_ID))).willReturn(Optional.empty());
     }
 
@@ -69,16 +70,14 @@ class LibraryReaderServiceImplTest {
 
     @Test
     @DisplayName(" корректно добавлять новый комментарий к книге ")
-    void commentBook() {
-        final GenericDaoResult<BookComment> bookComment = libraryReaderService.commentBook(1, "some comment");
-        assertThat(bookComment.getResult()).isPresent().get().isEqualTo(testComment);
+    void commentBook() throws DaoException {
+        final Optional<BookComment> bookComment = libraryReaderService.commentBook(1, "some comment");
+        assertThat(bookComment).isPresent().get().isEqualTo(testComment);
     }
 
     @Test
-    @DisplayName(" возвращать ошибку при попытке добавить комментарий к несуществующей книге ")
+    @DisplayName(" выкидывать exception при попытке добавить комментарий к несуществующей книге ")
     void commentMissingBook() {
-        final GenericDaoResult<BookComment> bookComment = libraryReaderService.commentBook(MISSING_BOOK_ID, "some comment");
-        assertThat(bookComment.getResult()).isNotPresent();
-        assertThat(bookComment.getError()).isNotEmpty();
+        assertThrows(DaoException.class,()->libraryReaderService.commentBook(MISSING_BOOK_ID, "some comment"));
     }
 }

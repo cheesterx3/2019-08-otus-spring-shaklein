@@ -56,7 +56,7 @@ class LibraryStorageServiceImplTest {
         given(authorRepository.getById(EXISTING_AUTHOR_ID)).willReturn(Optional.of(testAuthor));
         given(authorRepository.getById(MISSING_AUTHOR_ID)).willReturn(Optional.empty());
         given(genreRepository.getByName(anyString())).willReturn(Optional.of(testGenre));
-        given(bookRepository.insert(any(), any(), any())).willReturn(testBook);
+        given(bookRepository.insert(any())).willReturn(testBook);
         given(bookRepository.getById(anyLong())).willReturn(Optional.of(testBook));
     }
 

@@ -36,9 +36,10 @@ class BookRepositoryJpaImplTest {
         final Optional<Book> book = repositoryJpa.getById(2);
         assertThat(book)
                 .isNotEmpty()
-                .matches(b -> b.get().getName().equals("Book2"))
-                .matches(b -> b.get().getGenres().size() > 0)
-                .matches(b -> b.get().getAuthors().size() > 0);
+                .get()
+                .matches(b -> b.getName().equals("Book2"))
+                .matches(b -> !b.getGenres().isEmpty())
+                .matches(b -> !b.getAuthors().isEmpty());
         final Book actualBook = em.find(Book.class, 2L);
         assertThat(book).isPresent().get()
                 .isEqualToComparingFieldByFieldRecursively(actualBook);
@@ -57,8 +58,8 @@ class BookRepositoryJpaImplTest {
         final List<Book> books = repositoryJpa.getAll();
         assertThat(books).isNotNull()
                 .allMatch(b -> !b.getName().isEmpty())
-                .allMatch(b -> b.getGenres().size() > 0)
-                .allMatch(b -> b.getAuthors().size() > 0);
+                .allMatch(b -> !b.getGenres().isEmpty())
+                .allMatch(b -> !b.getAuthors().isEmpty());
     }
 
     @Test
@@ -83,9 +84,8 @@ class BookRepositoryJpaImplTest {
         final String bookName = "Some book";
         final Optional<Genre> genre = genreRepositoryJpa.getById(1);
         final Optional<Author> author = authorRepositoryJpa.getById(1);
-        final Book book=new Book(bookName);
-
-        final Book expectedBook = repositoryJpa.insert(book, author.get(), genre.get());
+        final Book book = new Book(bookName, author.get(), genre.get());
+        final Book expectedBook = repositoryJpa.insert(book);
         assertThat(expectedBook)
                 .isNotNull()
                 .matches(b -> b.getId() > 0)
@@ -97,12 +97,9 @@ class BookRepositoryJpaImplTest {
     }
 
     @Test
-    @DisplayName(" должен вернуть результат с ошибкой если жанр или автор null")
+    @DisplayName(" выдать NPE при попытке сохранить null-книгу")
     void insertWithAuthorOrGenreInCorrect() {
-        final String bookName = "Some book";
-        final Genre genre = null;
-        final Author author = null;
-        assertThrows(NullPointerException.class, () -> repositoryJpa.insert(new Book(bookName), author, genre));
+        assertThrows(NullPointerException.class, () -> repositoryJpa.insert(null));
     }
 
 

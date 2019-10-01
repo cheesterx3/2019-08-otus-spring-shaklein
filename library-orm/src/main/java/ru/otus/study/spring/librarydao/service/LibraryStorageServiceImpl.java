@@ -36,8 +36,8 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
         final Optional<Genre> genreInfo = genreRepository.getByName(genreName);
 
         final Author author = authorOptional.orElseThrow(() -> new DaoException("Author not found"));
-        final Genre genre = genreInfo.orElseGet(()->genreRepository.insert(genreName));
-        return Optional.of(bookRepository.insert(new Book(name), author, genre));
+        final Genre genre = genreInfo.orElseGet(() -> genreRepository.insert(new Genre(genreName)));
+        return Optional.of(bookRepository.insert(new Book(name, author, genre)));
     }
 
     @Override

@@ -36,9 +36,8 @@ public class GenreRepositoryJpaImpl implements GenreRepository {
     }
 
     @Override
-    public Genre insert(String genreName) {
-        Objects.requireNonNull(genreName, "Genre name cannot be null");
-        final Genre genre = new Genre(genreName);
+    public Genre insert(Genre genre) {
+        Objects.requireNonNull(genre, "Genre cannot be null");
         em.persist(genre);
         return genre;
     }

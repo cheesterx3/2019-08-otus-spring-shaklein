@@ -26,6 +26,10 @@ public class BookComment {
         time = LocalDateTime.now();
     }
 
+    public BookComment(String text, Book book) {
+        this(text);
+        this.book = book;
+    }
 
     public long getId() {
         return id;

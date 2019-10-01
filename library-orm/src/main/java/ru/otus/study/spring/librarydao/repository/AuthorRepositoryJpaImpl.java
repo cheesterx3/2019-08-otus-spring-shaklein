@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -16,7 +17,7 @@ public class AuthorRepositoryJpaImpl implements AuthorRepository {
 
     @Override
     public Optional<Author> getById(long id) {
-        return Optional.ofNullable(em.find(Author.class,id));
+        return Optional.ofNullable(em.find(Author.class, id));
     }
 
     @Override
@@ -26,15 +27,14 @@ public class AuthorRepositoryJpaImpl implements AuthorRepository {
     }
 
     @Override
-    public boolean deleteById(long authorId) {
-        final Optional<Author> author = getById(authorId);
-        author.ifPresent(a -> em.remove(a));
-        return author.isPresent();
+    public void delete(Author author) {
+        Objects.requireNonNull(author, "Author cannot be null");
+        em.remove(author);
     }
 
     @Override
-    public Author insert(String authorName) {
-        Author author = new Author(authorName);
+    public Author insert(Author author) {
+        Objects.requireNonNull(author, "Author cannot be null");
         em.persist(author);
         return author;
     }

@@ -11,8 +11,8 @@ public interface AuthorRepository {
 
     List<Author> getAll();
 
-    boolean deleteById(long authorId);
+    void delete(Author author);
 
-    Author insert(String authorName);
+    Author insert(Author author);
 
 }

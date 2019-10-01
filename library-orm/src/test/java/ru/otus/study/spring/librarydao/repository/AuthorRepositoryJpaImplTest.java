@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Репозиторий работы с авторами на основе Jpa ")
 @DataJpaTest
@@ -50,20 +49,19 @@ class AuthorRepositoryJpaImplTest {
     }
 
     @Test
-    @DisplayName(" должен корректно удалять автора по идентификтаору при его наличии и возвращать true")
-    void deleteById() {
-        final boolean deleted = repositoryJpa.deleteById(1);
+    @DisplayName(" должен корректно удалять автора")
+    void delete() {
+        final Author author = em.find(Author.class, 1L);
+        repositoryJpa.delete(author);
         final Author expectedAuthor = em.find(Author.class, 1L);
         assertThat(expectedAuthor).isNull();
-        assertTrue(deleted);
     }
 
     @Test
     @DisplayName(" должен корректно добавлять автора по имени и возвращать его экземпляр со сгенерированным идентификатором")
     void insert() {
         final String authorName = "SomeAuthor";
-        final Author author = repositoryJpa.insert(authorName);
-
+        final Author author = repositoryJpa.insert(new Author(authorName));
         assertThat(author)
                 .isNotNull()
                 .matches(a -> a.getId() > 0)

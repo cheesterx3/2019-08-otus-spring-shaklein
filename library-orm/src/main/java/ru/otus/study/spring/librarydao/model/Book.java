@@ -39,6 +39,13 @@ public class Book {
         genres = new ArrayList<>();
     }
 
+    public Book(String name, Author author, Genre genre) {
+        this(name);
+        authors.add(author);
+        genres.add(genre);
+    }
+
+
     public List<Author> getAuthors() {
         return authors;
     }

@@ -2,7 +2,7 @@ package ru.otus.study.spring.librarydao.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
+import ru.otus.study.spring.librarydao.exception.DaoException;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.BookComment;
 import ru.otus.study.spring.librarydao.repository.BookCommentRepository;
@@ -44,10 +44,12 @@ public class LibraryReaderServiceImpl implements LibraryReaderService {
     }
 
     @Override
-    @Transactional
-    public GenericDaoResult<BookComment> commentBook(long bookId, String comment) {
+    @Transactional(rollbackFor = DaoException.class)
+    public Optional<BookComment> commentBook(long bookId, String comment) throws DaoException {
         final Optional<Book> book = bookRepository.getById(bookId);
-        return book.map(value -> GenericDaoResult.createResult(bookCommentRepository.commentBook(value, comment)))
-                .orElse(GenericDaoResult.createError("Book was not found"));
+        return book.map(bookValue
+                -> Optional.ofNullable(bookCommentRepository.commentBook(new BookComment(comment, bookValue)))
+        ).orElseThrow(() -> new DaoException("Book was not found"));
     }
+
 }

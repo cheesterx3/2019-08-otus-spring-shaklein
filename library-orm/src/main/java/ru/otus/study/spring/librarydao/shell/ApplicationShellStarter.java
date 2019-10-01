@@ -4,7 +4,6 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.study.spring.librarydao.exception.DaoException;
-import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.BookComment;
 import ru.otus.study.spring.librarydao.repository.GenreRepository;
@@ -53,20 +52,25 @@ public class ApplicationShellStarter {
 
     @ShellMethod(value = "Add new comment to book", key = {"comment_book", "cb"})
     public BookComment commentBook(@ShellOption(help = "book id") long bookId, @ShellOption(help = "comment text") String comment) {
-        final GenericDaoResult<BookComment> commentBook = libraryReaderService.commentBook(bookId, comment);
-        return commentBook.getResult().orElseGet(() -> {
-            System.out.println(commentBook.getError());
-            return null;
-        });
+        try {
+            final Optional<BookComment> bookComment = libraryReaderService.commentBook(bookId, comment);
+            return bookComment.orElseGet(() -> {
+                System.out.println("Book comment was not added");
+                return null;
+            });
+        } catch (DaoException e) {
+            System.out.println("Book comment adding error. " + e.getMessage());
+        }
+        return null;
     }
 
     @ShellMethod(value = "Find a book by id", key = {"find_book", "fb"})
     public Book getBookById(@ShellOption(help = "book id") long id) {
         final Optional<Book> book = libraryReaderService.getBookById(id);
-        if (!book.isPresent()) {
+        return book.orElseGet(()->{
             System.out.println("Book with entered id not found");
-        }
-        return book.orElse(null);
+            return null;
+        });
     }
 
     @ShellMethod(value = "Delete a book by id", key = {"del_book", "db"})

@@ -49,10 +49,10 @@ class GenreRepositoryJpaImplTest {
     }
 
     @Test
-    @DisplayName(" должен корректно добавлять жанр по имени и возвращать его экземпляр со сгенерированным идентификатором")
+    @DisplayName(" должен корректно добавлять жанр и возвращать его экземпляр со сгенерированным идентификатором")
     void insert() {
         final String genreName = "Some genre";
-        final Genre genre = genreRepositoryJpa.insert(genreName);
+        final Genre genre = genreRepositoryJpa.insert(new Genre(genreName));
         assertThat(genre)
                 .isNotNull()
                 .matches(g -> g.getId() > 0)

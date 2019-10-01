@@ -1,6 +1,6 @@
 package ru.otus.study.spring.librarydao.service;
 
-import ru.otus.study.spring.librarydao.helper.GenericDaoResult;
+import ru.otus.study.spring.librarydao.exception.DaoException;
 import ru.otus.study.spring.librarydao.model.Book;
 import ru.otus.study.spring.librarydao.model.BookComment;
 
@@ -14,5 +14,5 @@ public interface LibraryReaderService {
 
     List<BookComment> getBookComments(long bookId);
 
-    GenericDaoResult<BookComment> commentBook(long bookId, String comment);
+    Optional<BookComment> commentBook(long bookId, String comment) throws DaoException;
 }

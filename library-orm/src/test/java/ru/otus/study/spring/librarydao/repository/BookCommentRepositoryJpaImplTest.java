@@ -33,15 +33,16 @@ class BookCommentRepositoryJpaImplTest {
     void commentBook() {
         final String commentText = "Some comment";
         final Book book = em.find(Book.class, 1L);
-        final BookComment bookComment = bookCommentRepository.commentBook(book, commentText);
-        assertThat(bookComment).isNotNull()
+        final BookComment bookComment = new BookComment(commentText, book);
+        final BookComment expectedComment = bookCommentRepository.commentBook(bookComment);
+        assertThat(expectedComment).isNotNull()
                 .matches(comment -> comment.getText().equals(commentText))
                 .matches(comment -> comment.getId() > 0)
                 .matches(comment -> comment.getBook() == book);
 
-        final BookComment actualComment = em.find(BookComment.class, bookComment.getId());
+        final BookComment actualComment = em.find(BookComment.class, expectedComment.getId());
         assertThat(actualComment).isNotNull()
-                .isEqualToComparingFieldByFieldRecursively(bookComment);
+                .isEqualToComparingFieldByFieldRecursively(expectedComment);
     }
 
     @Test

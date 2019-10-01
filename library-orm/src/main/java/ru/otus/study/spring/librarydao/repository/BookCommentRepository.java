@@ -6,7 +6,7 @@ import ru.otus.study.spring.librarydao.model.BookComment;
 import java.util.List;
 
 public interface BookCommentRepository {
-    BookComment commentBook(Book book, String comment);
+    BookComment commentBook(BookComment bookComment);
 
     List<BookComment> getBookComments(Book book);
 }
