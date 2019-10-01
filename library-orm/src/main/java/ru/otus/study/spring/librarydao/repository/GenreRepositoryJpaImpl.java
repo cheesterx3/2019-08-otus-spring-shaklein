@@ -2,7 +2,6 @@ package ru.otus.study.spring.librarydao.repository;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.study.spring.librarydao.model.Genre;
 
 import javax.persistence.EntityManager;
@@ -37,7 +36,6 @@ public class GenreRepositoryJpaImpl implements GenreRepository {
     }
 
     @Override
-    @Transactional
     public Genre insert(String genreName) {
         Objects.requireNonNull(genreName, "Genre name cannot be null");
         final Genre genre = new Genre(genreName);

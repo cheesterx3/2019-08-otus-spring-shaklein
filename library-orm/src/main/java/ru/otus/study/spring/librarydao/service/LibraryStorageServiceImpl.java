@@ -27,7 +27,7 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = DaoException.class)
     public Optional<Book> addNewBook(String name, long authorId, String genreName) throws DaoException {
         if (Objects.isNull(genreName)) {
             throw new DaoException("Genre name cannot be null");
