@@ -17,20 +17,17 @@ public class LibraryReaderServiceImpl implements LibraryReaderService {
     private final BookRepository bookRepository;
     private final BookCommentRepository bookCommentRepository;
 
-
     public LibraryReaderServiceImpl(BookRepository bookRepository, BookCommentRepository bookCommentRepository) {
         this.bookRepository = bookRepository;
         this.bookCommentRepository = bookCommentRepository;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<Book> getBookById(long id) {
         return bookRepository.findById(id);
     }

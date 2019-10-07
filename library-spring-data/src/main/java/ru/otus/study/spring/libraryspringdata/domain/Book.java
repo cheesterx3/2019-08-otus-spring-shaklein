@@ -45,7 +45,6 @@ public class Book {
         genres.add(genre);
     }
 
-
     public List<Author> getAuthors() {
         return authors;
     }

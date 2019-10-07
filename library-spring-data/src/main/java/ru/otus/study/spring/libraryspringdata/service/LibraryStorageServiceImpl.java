@@ -19,13 +19,11 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
     private final BookRepository bookRepository;
     private final GenreRepository genreRepository;
 
-
     public LibraryStorageServiceImpl(AuthorRepository authorRepository, BookRepository bookRepository, GenreRepository genreRepository) {
         this.authorRepository = authorRepository;
         this.bookRepository = bookRepository;
         this.genreRepository = genreRepository;
     }
-
 
     @Override
     @Transactional(rollbackFor = DaoException.class)
