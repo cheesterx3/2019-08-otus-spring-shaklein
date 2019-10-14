@@ -11,15 +11,17 @@ import org.springframework.data.domain.Sort;
 import ru.otus.study.spring.librarymongo.domain.Book;
 import ru.otus.study.spring.librarymongo.domain.BookComment;
 import ru.otus.study.spring.librarymongo.exception.DaoException;
+import ru.otus.study.spring.librarymongo.repository.AuthorRepository;
 import ru.otus.study.spring.librarymongo.repository.BookCommentRepository;
 import ru.otus.study.spring.librarymongo.repository.BookRepository;
+import ru.otus.study.spring.librarymongo.repository.GenreRepository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
@@ -36,8 +38,13 @@ class LibraryReaderServiceImplTest {
     private BookRepository bookRepository;
     @MockBean
     private BookCommentRepository bookCommentRepository;
+    @MockBean
+    private AuthorRepository authorRepository;
+    @MockBean
+    private GenreRepository genreRepository;
     @Autowired
     private LibraryReaderService libraryReaderService;
+
 
     @BeforeEach
     void setUp() {

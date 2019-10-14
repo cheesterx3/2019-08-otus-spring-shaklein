@@ -3,11 +3,15 @@ package ru.otus.study.spring.librarymongo.service;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.otus.study.spring.librarymongo.domain.Author;
 import ru.otus.study.spring.librarymongo.domain.Book;
 import ru.otus.study.spring.librarymongo.domain.BookComment;
+import ru.otus.study.spring.librarymongo.domain.Genre;
 import ru.otus.study.spring.librarymongo.exception.DaoException;
+import ru.otus.study.spring.librarymongo.repository.AuthorRepository;
 import ru.otus.study.spring.librarymongo.repository.BookCommentRepository;
 import ru.otus.study.spring.librarymongo.repository.BookRepository;
+import ru.otus.study.spring.librarymongo.repository.GenreRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +22,18 @@ import java.util.Optional;
 public class LibraryReaderServiceImpl implements LibraryReaderService {
     private final BookRepository bookRepository;
     private final BookCommentRepository commentRepository;
+    private final AuthorRepository authorRepository;
+    private final GenreRepository genreRepository;
+
+    @Override
+    public List<Author> findAllAuthors() {
+        return authorRepository.findAll();
+    }
+
+    @Override
+    public List<Genre> findAllGenres() {
+        return genreRepository.findAll();
+    }
 
     @Override
     public List<Book> getAllBooksSortedByName() {

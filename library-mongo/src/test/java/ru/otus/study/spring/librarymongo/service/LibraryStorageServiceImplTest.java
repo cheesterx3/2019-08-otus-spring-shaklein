@@ -18,7 +18,8 @@ import ru.otus.study.spring.librarymongo.repository.GenreRepository;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
@@ -30,6 +31,8 @@ class LibraryStorageServiceImplTest {
     private final static String GENRE_NAME = "TestGenre";
 
     private final static String EXISTING_AUTHOR_ID = "EXISTING_ID";
+    private final static String EXISTING_GENRE_ID = "EXISTING_GENRE_ID";
+    private final static String MISSING_ON_BOOK_GENRE_ID = "MISSING_ON_BOOK_GENRE_ID";
     private final static String MISSING_AUTHOR_ID = "MISSING_ID";
 
     @Mock
@@ -55,6 +58,10 @@ class LibraryStorageServiceImplTest {
         given(genreRepository.findByNameIgnoreCase(anyString())).willReturn(Optional.of(testGenre));
         given(bookRepository.save(any())).willReturn(testBook);
         given(bookRepository.findById(anyString())).willReturn(Optional.of(testBook));
+        given(authorRepository.save(any())).willReturn(testAuthor);
+        given(authorRepository.existsByNameEqualsIgnoreCase(EXISTING_AUTHOR_ID)).willReturn(true);
+        given(bookRepository.existsByGenresContains(EXISTING_GENRE_ID)).willReturn(true);
+        given(bookRepository.existsByAuthorsContains(EXISTING_AUTHOR_ID)).willReturn(true);
     }
 
     @Test
@@ -85,4 +92,32 @@ class LibraryStorageServiceImplTest {
         final boolean deleteBook = libraryStorageService.deleteBook("ANY_ID");
         assertTrue(deleteBook);
     }
+
+    @Test
+    @DisplayName(" корректно добавлять автора в библиотеку")
+    void addNewAuthorCorrect() throws DaoException {
+        final Optional<Author> author = libraryStorageService.addNewAuthor("Some author");
+        assertThat(author).isPresent()
+                .get()
+                .isEqualTo(testAuthor);
+    }
+
+    @Test
+    @DisplayName(" выдавать исключение при попытке добавить существующего автора в библиотеку")
+    void addNewAuthorInCorrect() throws DaoException {
+        assertThrows(DaoException.class, () -> libraryStorageService.addNewAuthor(EXISTING_AUTHOR_ID));
+    }
+
+    @Test
+    @DisplayName(" выдавать исключение при попытке удалять жанр из библиотеки, если он привязан к книгам")
+    void deleteGenreInCorrect() throws DaoException {
+        assertThrows(DaoException.class, () -> libraryStorageService.deleteGenre(EXISTING_GENRE_ID));
+    }
+
+    @Test
+    @DisplayName(" выдавать исключение при попытке удалять автора из библиотеки, если он привязан к книгам")
+    void deleteAuthorInCorrect() throws DaoException {
+        assertThrows(DaoException.class, () -> libraryStorageService.deleteAuthor(EXISTING_AUTHOR_ID));
+    }
+
 }

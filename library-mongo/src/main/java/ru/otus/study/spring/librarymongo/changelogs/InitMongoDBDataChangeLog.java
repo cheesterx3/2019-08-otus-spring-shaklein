@@ -47,7 +47,7 @@ public class InitMongoDBDataChangeLog {
         books.add(template.save(secondBook));
         final Book thirdBook = new Book("Сборник рассказов и повестей", authors.get(1), genres.get(2));
         thirdBook.getGenres().add(genres.get(0));
-        thirdBook.getAuthors().add(authors.get(1));
+        thirdBook.getAuthors().add(authors.get(2));
         books.add(template.save(thirdBook));
     }
 

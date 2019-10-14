@@ -4,3 +4,4 @@ spring:
       uri: mongodb://localhost
       port: 27017
       database: library
+
