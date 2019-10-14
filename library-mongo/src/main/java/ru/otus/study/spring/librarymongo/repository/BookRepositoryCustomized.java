@@ -13,6 +13,8 @@ public interface BookRepositoryCustomized {
 
     boolean existsByGenresContains(String genreId);
 
+    boolean existsByIdAndGenresContains(String bookId, String genreName);
+
     void removeAuthorFromBookByBookId(String bookId, String authorId) throws DaoException;
 
     void addAuthorToBook(String bookId, Author author);

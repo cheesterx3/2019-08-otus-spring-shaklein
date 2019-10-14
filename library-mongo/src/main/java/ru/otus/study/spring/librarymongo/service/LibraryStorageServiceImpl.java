@@ -77,8 +77,7 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
     @Override
     public void addGenreToBook(String bookId, String genreName) throws DaoException {
         checkForBookIsPresentById(bookId);
-        final Optional<Book> bookWithGenre = bookRepository.findWithOnlyIdByIdAndGenresContains(bookId, genreName);
-        if (bookWithGenre.isPresent()) {
+        if (bookRepository.existsByIdAndAuthorsContains(bookId,genreName)) {
             throw new DaoException(String.format("Genre with name [%s] is already assigned to book", genreName));
         }
         final Genre genre = findOrCreateGenre(genreName);

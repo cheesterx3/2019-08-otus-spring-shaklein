@@ -94,7 +94,7 @@ public class BookRepositoryCustomizedImpl implements BookRepositoryCustomized {
         mongoTemplate.updateFirst(query, update, Book.class);
     }
 
-    public boolean existsByIdAndGenresContainsE(String bookId, String genreName) {
+    public boolean existsByIdAndGenresContains(String bookId, String genreName) {
         Query query = new Query((Criteria.where("_id").is(new ObjectId(bookId))).and("genres.name").regex(genreName, "i"));
         return mongoTemplate.exists(query, Book.class);
     }
