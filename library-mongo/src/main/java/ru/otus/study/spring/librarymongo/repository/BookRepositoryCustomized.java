@@ -11,8 +11,6 @@ public interface BookRepositoryCustomized {
 
     List<Genre> findGenresForBookId(String bookId);
 
-    boolean existsByGenresContains(String genreId);
-
     boolean existsByIdAndGenresContains(String bookId, String genreName);
 
     void removeAuthorFromBookByBookId(String bookId, String authorId) throws DaoException;
@@ -21,4 +19,7 @@ public interface BookRepositoryCustomized {
 
     void addGenreToBook(String bookId, Genre genre);
 
+    boolean hasBookWithSingleAuthorId(String authorId);
+
+    boolean hasBookWithSingleGenreId(String genreId);
 }

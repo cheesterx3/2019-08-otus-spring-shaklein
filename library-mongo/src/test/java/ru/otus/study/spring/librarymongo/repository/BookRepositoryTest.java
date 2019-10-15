@@ -106,22 +106,21 @@ class BookRepositoryTest extends AbstractRepositoryTest {
                 .isEqualTo(book.getGenres());
     }
 
-    @DisplayName("возвращать true при проверке на наличие книг с жанром по идентификтаору, если таковые имеются")
+    @DisplayName("возвращать true при проверке на наличие книг с единственным жанром по идентификтаору, если таковые имеются")
     @Test
     void shouldReturnTrueIfContainsBookWithGenre() {
-        final List<Book> allBooks = bookRepository.findAll();
-        final Book book = allBooks.get(0);
-        final Genre genre = book.getGenres().get(0);
-        final boolean exists = bookRepository.existsByGenresContains(genre.getId());
+        final List<Genre> genreList = genreRepository.findAll();
+        final Genre genre = genreList.get(1);
+        final boolean exists = bookRepository.hasBookWithSingleGenreId(genre.getId());
         assertThat(exists).isTrue();
     }
 
-    @DisplayName("возвращать false при проверке на наличие книг с жанром по идентификтаору, если таковых нет")
+    @DisplayName("возвращать false при проверке на наличие книг с единственным жанром по идентификтаору, если таковых нет")
     @Test
     void shouldReturnFalseIfNotContainsBookWithGenre() {
         final List<Genre> genreList = genreRepository.findAll();
         final Genre genre = genreList.get(3);
-        final boolean exists = bookRepository.existsByGenresContains(genre.getId());
+        final boolean exists = bookRepository.hasBookWithSingleGenreId(genre.getId());
         assertThat(exists).isFalse();
     }
 

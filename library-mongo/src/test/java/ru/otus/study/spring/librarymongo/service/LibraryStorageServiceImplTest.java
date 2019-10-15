@@ -60,8 +60,8 @@ class LibraryStorageServiceImplTest {
         given(bookRepository.findById(anyString())).willReturn(Optional.of(testBook));
         given(authorRepository.save(any())).willReturn(testAuthor);
         given(authorRepository.existsByNameEqualsIgnoreCase(EXISTING_AUTHOR_ID)).willReturn(true);
-        given(bookRepository.existsByGenresContains(EXISTING_GENRE_ID)).willReturn(true);
-        given(bookRepository.existsByAuthorsContains(EXISTING_AUTHOR_ID)).willReturn(true);
+        given(bookRepository.hasBookWithSingleGenreId(EXISTING_GENRE_ID)).willReturn(true);
+        given(bookRepository.hasBookWithSingleAuthorId(EXISTING_AUTHOR_ID)).willReturn(true);
     }
 
     @Test
@@ -115,7 +115,7 @@ class LibraryStorageServiceImplTest {
     }
 
     @Test
-    @DisplayName(" выдавать исключение при попытке удалять автора из библиотеки, если он привязан к книгам")
+    @DisplayName(" выдавать исключение при попытке удалять автора из библиотеки, если он привязан к книгам как единственный автор")
     void deleteAuthorInCorrect() throws DaoException {
         assertThrows(DaoException.class, () -> libraryStorageService.deleteAuthor(EXISTING_AUTHOR_ID));
     }

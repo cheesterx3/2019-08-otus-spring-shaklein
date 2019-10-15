@@ -55,16 +55,16 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
 
     @Override
     public void deleteGenre(String genreId) throws DaoException {
-        if (bookRepository.existsByGenresContains(genreId)) {
-            throw new DaoException("Unable to remove genre, cause it assigned to book(s). Remove genre from book(s) first");
+        if (bookRepository.hasBookWithSingleGenreId(genreId)) {
+            throw new DaoException("Unable to remove genre, cause it assigned to book(s) as single genre. Remove genre from book(s) first");
         }
         genreRepository.deleteById(genreId);
     }
 
     @Override
     public void deleteAuthor(String authorId) throws DaoException {
-        if (bookRepository.existsByAuthorsContains(authorId)) {
-            throw new DaoException("Unable to remove author, cause it assigned to book(s). Remove author from book(s) first");
+        if (bookRepository.hasBookWithSingleAuthorId(authorId)) {
+            throw new DaoException("Unable to remove author, cause it assigned to book(s) as single author. Remove author from book(s) first");
         }
         authorRepository.deleteById(authorId);
     }

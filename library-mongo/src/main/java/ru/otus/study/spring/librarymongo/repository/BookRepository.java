@@ -12,6 +12,7 @@ public interface BookRepository extends MongoRepository<Book, String>, BookRepos
     boolean existsByIdAndAuthorsContains(String bookId, @Param("_id") String authorId);
 
     boolean existsByAuthorsContains(@Param("_id") String authorId);
+
 }
 
 

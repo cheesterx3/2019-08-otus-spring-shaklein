@@ -61,11 +61,6 @@ public class BookRepositoryCustomizedImpl implements BookRepositoryCustomized {
         return mongoTemplate.aggregate(aggregation, Book.class, Genre.class).getMappedResults();
     }
 
-    @Override
-    public boolean existsByGenresContains(String genreId) {
-        Query query = new Query(Criteria.where("genres._id").is(new ObjectId(genreId)));
-        return mongoTemplate.exists(query,Book.class);
-    }
 
     @Override
     public void removeAuthorFromBookByBookId(String bookId, String authorId) throws DaoException {
@@ -107,4 +102,13 @@ public class BookRepositoryCustomizedImpl implements BookRepositoryCustomized {
         return Objects.nonNull(arraySizeProjection) && (arraySizeProjection.size > 1);
     }
 
+    public boolean hasBookWithSingleAuthorId(String authorId){
+        Query query=new Query(Criteria.where("authors").size(1).and("authors.$id").is(new ObjectId(authorId)));
+        return mongoTemplate.exists(query, Book.class);
+    }
+
+    public boolean hasBookWithSingleGenreId(String genreId){
+        Query query=new Query(Criteria.where("genres").size(1).and("genres._id").is(new ObjectId(genreId)));
+        return mongoTemplate.exists(query, Book.class);
+    }
 }
