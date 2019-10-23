@@ -12,6 +12,7 @@ import ru.otus.study.spring.librarymvc.domain.Book;
 import ru.otus.study.spring.librarymvc.domain.BookEditForm;
 import ru.otus.study.spring.librarymvc.domain.BookNewForm;
 import ru.otus.study.spring.librarymvc.exception.DaoException;
+import ru.otus.study.spring.librarymvc.exception.NotFoundException;
 import ru.otus.study.spring.librarymvc.service.LibraryReaderService;
 import ru.otus.study.spring.librarymvc.service.LibraryStorageService;
 
@@ -34,6 +35,13 @@ public class BookController {
     @ExceptionHandler(DaoException.class)
     public ModelAndView handleDaoException(DaoException e) {
         ModelAndView modelAndView = new ModelAndView("err500");
+        modelAndView.addObject("message", e.getMessage());
+        return modelAndView;
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ModelAndView handleNotFoundException(NotFoundException e) {
+        ModelAndView modelAndView = new ModelAndView("err404");
         modelAndView.addObject("message", e.getMessage());
         return modelAndView;
     }
@@ -68,13 +76,13 @@ public class BookController {
     }
 
     @GetMapping("/book/{id}/update")
-    public String editBookPage(@PathVariable("id") String bookId, @ModelAttribute("bookForm") BookEditForm form, Model model) throws DaoException {
+    public String editBookPage(@PathVariable("id") String bookId, @ModelAttribute("bookForm") BookEditForm form, Model model) throws NotFoundException {
         return readerService.findBookById(bookId)
                 .map(book -> {
                     populateModelWithBook(form, book, model);
                     return "editBook";
                 })
-                .orElseThrow(() -> new DaoException("Book not found"));
+                .orElseThrow(() -> new NotFoundException("Book not found"));
     }
 
     @PostMapping("/book/update")
