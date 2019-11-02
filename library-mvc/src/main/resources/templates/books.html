@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список книг</title>
+    <link rel="stylesheet" href="../static/css/pure.css" th:href="@{/css/pure.css}">
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+<body class="block">
+<h1>Список доступных книг в библиотеке</h1>
+<div><a href="addBook.html" th:href="@{/book/add}">Добавить</a></div>
+<table class="pure-table">
+    <thead>
+    <tr>
+        <th>Название</th>
+        <th>Жанры</th>
+        <th>Авторы</th>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book:${books}">
+        <td th:text="${book.name}">Война и Мир</td>
+        <td th:text="${book.genresInfo}">Классика</td>
+        <td th:text="${book.authorsInfo}">Толстой Л.Н</td>
+        <td>
+            <a href="editBook.html" th:href="@{/book/{id}/update(id=${book.id})}">Изменить</a>
+        </td>
+        <td>
+            <form th:action="@{/book/{id}/delete(id=${book.id})}" method="post">
+                <button class="pure-button" type="submit" onclick="return confirm('Уверены, что хотите удалить?')">
+                    Удалить
+                </button>
+            </form>
+        </td>
+
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
