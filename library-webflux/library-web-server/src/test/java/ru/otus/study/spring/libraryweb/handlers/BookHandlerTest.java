@@ -6,24 +6,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.study.spring.libraryweb.domain.Author;
 import ru.otus.study.spring.libraryweb.domain.Book;
 import ru.otus.study.spring.libraryweb.domain.Genre;
+import ru.otus.study.spring.libraryweb.exception.DaoException;
+import ru.otus.study.spring.libraryweb.exception.NotFoundException;
 import ru.otus.study.spring.libraryweb.repository.AuthorRepository;
 import ru.otus.study.spring.libraryweb.repository.BookRepository;
 import ru.otus.study.spring.libraryweb.repository.GenreRepository;
-
-import java.util.List;
+import ru.otus.study.spring.libraryweb.service.BookService;
 
 import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -31,9 +35,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
-@WebFluxTest(BookHandler.class)
+@WebFluxTest(controllers = {BookHandler.class,RegistryHandler.class})
 @EnableConfigurationProperties
 @AutoConfigureDataMongo
+@ComponentScan({"ru.otus.study.spring.libraryweb.config"})
 @DisplayName("Обработчик маршрутов работы с книгами должен ")
 class BookHandlerTest {
     private final static String TEST_BOOK_NAME = "TestBook";
@@ -48,19 +53,23 @@ class BookHandlerTest {
     @Mock
     private Genre genre;
     @MockBean
+    private BookService bookService;
+    @MockBean
     private AuthorRepository authorRepository;
     @MockBean
     private GenreRepository genreRepository;
     @MockBean
     private BookRepository bookRepository;
+
     @Autowired
-    private ApplicationContext context;
+    @Qualifier("bookRoute")
+    private RouterFunction<ServerResponse> routerFunction;
 
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
-        webTestClient = WebTestClient.bindToApplicationContext(context).build();
+        webTestClient = WebTestClient.bindToRouterFunction(routerFunction).build();
         given(book.getId()).willReturn(TEST_BOOK_ID);
         given(book.getName()).willReturn(TEST_BOOK_NAME);
         given(book.getAuthorsInfo()).willReturn(TEST_AUTHOR_NAME);
@@ -111,8 +120,7 @@ class BookHandlerTest {
     @Test
     void shouldCreateBookAndReturnCreated() {
         given(bookRepository.save(any())).willReturn(Mono.just(book));
-        given(authorRepository.findAllById(any(List.class))).willReturn(Flux.just(author));
-        given(genreRepository.findAllById(any(List.class))).willReturn(Flux.just(genre));
+        given(bookService.createNewBookFromDto(any())).willReturn(Mono.just(book));
         webTestClient.post()
                 .uri("/api/books")
                 .accept(MediaType.APPLICATION_JSON)
@@ -131,6 +139,7 @@ class BookHandlerTest {
     @DisplayName("при попытке добавления книги без жанров/авторов должен возвращать статус BadRequest")
     @Test
     void shouldReturnErrorIfNoAuthorsOrGenres() {
+        given(bookService.createNewBookFromDto(any())).willReturn(Mono.error(new DaoException("")));
         webTestClient.post()
                 .uri("/api/books")
                 .accept(MediaType.APPLICATION_JSON)
@@ -143,8 +152,7 @@ class BookHandlerTest {
     @DisplayName("при попытке добавления книги не найдя жанров/авторов в базе должен возвращать статус NotFound")
     @Test
     void shouldReturnErrorIfNoAuthorsOrGenresFound() {
-        given(authorRepository.findAllById(any(List.class))).willReturn(Flux.empty());
-        given(genreRepository.findAllById(any(List.class))).willReturn(Flux.empty());
+        given(bookService.createNewBookFromDto(any())).willReturn(Mono.error(new NotFoundException("")));
         webTestClient.post()
                 .uri("/api/books")
                 .accept(MediaType.APPLICATION_JSON)
@@ -156,9 +164,8 @@ class BookHandlerTest {
 
     @DisplayName("при успешном сохранении книги должен возвращать статус Ok и сохранённую книгу в ответе")
     @Test
-    void shouldSaveBookAndReturnSaved() throws Exception {
-        given(authorRepository.findAllById(any(List.class))).willReturn(Flux.just(author));
-        given(genreRepository.findAllById(any(List.class))).willReturn(Flux.just(genre));
+    void shouldSaveBookAndReturnSaved() {
+        given(bookService.createBookForSave(any(),any())).willReturn(Mono.just(book));
         given(bookRepository.save(any())).willReturn(Mono.just(book));
         given(bookRepository.findById(anyString())).willReturn(Mono.just(book));
         webTestClient.put()
@@ -178,7 +185,7 @@ class BookHandlerTest {
 
     @DisplayName("при попытке сохранения несуществующей книги должен возвращать статус NotFound")
     @Test
-    void shouldReturnNotFoundWhenSaveNotExistantBook() throws Exception {
+    void shouldReturnNotFoundWhenSaveNotExistantBook() {
         given(bookRepository.findById(anyString())).willReturn(Mono.empty());
         webTestClient.put()
                 .uri("/api/books/bookId")
@@ -191,8 +198,9 @@ class BookHandlerTest {
 
     @DisplayName("при попытке сохранения книги без жанров/авторов должен возвращать статус BadRequest")
     @Test
-    void shouldReturnBadRequestWhenSaveWithEmptyAuthorsOrGenres() throws Exception {
+    void shouldReturnBadRequestWhenSaveWithEmptyAuthorsOrGenres() {
         given(bookRepository.findById(anyString())).willReturn(Mono.just(book));
+        given(bookService.createBookForSave(any(),any())).willReturn(Mono.error(new DaoException("")));
         webTestClient.put()
                 .uri("/api/books/bookId")
                         .accept(MediaType.APPLICATION_JSON)
