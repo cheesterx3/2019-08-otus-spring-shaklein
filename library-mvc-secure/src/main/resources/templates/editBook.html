@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новая книга</title>
+    <link rel="stylesheet" href="../static/css/pure.css" th:href="@{/css/pure.css}">
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+<body class="block">
+<div><a href="/" th:href="@{/}">Вернуться к списку книг</a></div>
+<h1>Редактирование книги</h1>
+<fieldset>
+    <form class="pure-form pure-form-aligned" th:object="${bookForm}" th:action="@{/book/update}" method="post">
+        <div class="pure-control-group">
+            <input type="hidden" name="id" th:value="${book.id}">
+            <label for="name">Название книги</label>
+            <input id="name" name="name" type="text" th:field="*{name}" placeholder="Название книги">
+            <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Какая-то ошибка</span>
+            <div class="pure-controls">
+                <button type="submit" class="pure-button pure-button-primary">Сохранить</button>
+            </div>
+        </div>
+    </form>
+    <div class="pure-control-group">
+        <h3>Жанры</h3>
+        <table class="pure-table">
+            <tr th:each="genre:${book.genres}">
+                <td th:text="${genre.name}">Классика</td>
+                <td>
+                    <input type="hidden" name="genreId" th:value="${genre.id}">
+                    <form th:if="${#lists.size(book.genres)>1}"
+                          th:action="@{/book/{id}/genre/{genre_id}/delete(id=${book.id},genre_id=${genre.id})}"
+                          method="post">
+                        <button class="pure-button" type="submit"
+                                onclick="return confirm('Уверены, что хотите удалить?')">
+                            Удалить
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="!${#lists.isEmpty(filteredGenres)}">
+                <td colspan="2"><b>Добавление жанра</b></td>
+            </tr>
+            <tr th:if="!${#lists.isEmpty(filteredGenres)}">
+                <form th:action="@{/book/{id}/genre(id=${book.id})}" method="post">
+                    <td>
+                        <select id="genre" name="genreId">
+                            <option th:each="genre:${filteredGenres}" value="Классика" th:value="${genre.id}"
+                                    th:text="${genre.name}">
+                                Классика
+                            </option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="pure-button" type="submit">
+                            Добавить
+                        </button>
+                    </td>
+                </form>
+            </tr>
+        </table>
+    </div>
+    <div class="pure-control-group">
+        <h3>Авторы</h3>
+        <table class="pure-table">
+            <tr th:each="author:${book.authors}">
+                <td>
+                    <span th:text="${author.name}">Тлстой Л.Н.</span>
+                </td>
+                <td>
+                    <input type="hidden" name="authorId" th:value="${author.id}">
+                    <form th:if="${#lists.size(book.authors)>1}"
+                          th:action="@{/book/{id}/author/{author_id}/delete(id=${book.id},author_id=${author.id})}"
+                          method="post">
+                        <button class="pure-button" type="submit"
+                                onclick="return confirm('Уверены, что хотите удалить?')">
+                            Удалить
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="!${#lists.isEmpty(filteredAuthors)}">
+                <td colspan="2"><b>Добавление автора</b></td>
+            </tr>
+            <tr th:if="!${#lists.isEmpty(filteredAuthors)}">
+                <form th:action="@{/book/{id}/author(id=${book.id})}" method="post">
+                    <td>
+                        <select id="author" name="authorId">
+                            <option th:each="author:${filteredAuthors}" value="1" th:value="${author.id}"
+                                    th:text="${author.name}">
+                                Л.Н. Толстой
+                            </option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="pure-button" type="submit">
+                            Добавить
+                        </button>
+                    </td>
+                </form>
+            </tr>
+        </table>
+    </div>
+
+</fieldset>
+
+
+</body>
+</html>

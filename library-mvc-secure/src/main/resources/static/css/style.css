@@ -1,0 +1,17 @@
+.error {
+    color: darkred;
+}
+
+.block {
+    padding: 24px;
+}
+
+.comment{
+    padding: 8px;
+}
+
+.comment-meta{
+    font-size: small;
+    font-style: italic;
+    margin: 4px;
+}

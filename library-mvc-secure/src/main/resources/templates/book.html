@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{book.pagetitle(${book.name})}">Страница книги</title>
+    <link rel="stylesheet" href="../static/css/pure.css" th:href="@{/css/pure.css}">
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+<body class="block">
+<h1 th:text="${book.name}">Название книги</h1>
+<div>Жанры: <span th:text="${book.genresInfo}">Жанры книги</span></div>
+<div>Авторы: <span th:text="${book.authorsInfo}">Авторы книги</span></div>
+
+<div style="margin-top: 24px">
+    <h3>Комментарии читателей:</h3>
+    <div sec:authorize="isAuthenticated()">
+        <form th:action="@{/book/comment}" th:object="${commentForm}" method="post">
+            <input type="hidden" name="id" th:value="${book.id}">
+            <textarea th:field="*{comment}" name="comment"></textarea>
+            <div>
+                <button class="pure-button" type="submit">Добавить</button>
+            </div>
+            <span class="error" th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}">Какая-то ошибка</span>
+        </form>
+    </div>
+    <div class="comment" th:each="comment:${comments}">
+        <div class="comment-meta"><span th:text="${comment.getUser().getName()}">Пользователь</span></div>
+        <div th:text="${comment.getText()}">Текст комментария</div>
+        <div class="comment-meta"><span th:text="${#temporals.format(comment.getTime(), 'dd-MM-yyyy HH:mm')}">10.12.2019 10:00</span></div>
+    </div>
+</div>
+</body>
+</html>
