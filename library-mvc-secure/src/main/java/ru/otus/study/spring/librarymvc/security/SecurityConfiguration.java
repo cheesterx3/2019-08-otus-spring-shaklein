@@ -13,7 +13,6 @@ import ru.otus.study.spring.librarymvc.repository.UserRepository;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private final UserRepository userRepository;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {

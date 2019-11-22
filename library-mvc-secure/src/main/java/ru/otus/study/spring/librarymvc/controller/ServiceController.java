@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class ServiceController {
 
     @GetMapping("/denied")
-    public String bookList(Model model) {
+    public String deniedPage() {
         return "err403";
     }
 }
