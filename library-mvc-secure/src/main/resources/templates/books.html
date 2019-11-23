@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Список книг</title>
+    <link rel="stylesheet" href="../static/css/pure.css" th:href="@{/css/pure.css}">
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+<body class="block">
+<div sec:authorize="isAuthenticated()">Добро пожаловать <span th:text="${#authentication.principal.description}">Имя пользователя</span></div>
+<div><a sec:authorize="!isAuthenticated()" th:href="@{/login}">Войти</a><a sec:authorize="isAuthenticated()" th:href="@{/logout}">Выйти</a></div>
+<h1>Список доступных книг в библиотеке</h1>
+<div><a sec:authorize="hasRole('ROLE_ADMIN')" href="addBook.html" th:href="@{/book/add}">Добавить</a></div>
+<table class="pure-table">
+    <thead>
+    <tr>
+        <th>Название</th>
+        <th>Жанры</th>
+        <th>Авторы</th>
+        <th sec:authorize="hasRole('ROLE_ADMIN')"></th>
+        <th sec:authorize="hasRole('ROLE_ADMIN')"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book:${books}">
+        <td><a th:href="@{/book/{id}(id=${book.id})}" href="/book/someid" th:text="${book.name}">Война и Мир</a></td>
+        <td th:text="${book.genresInfo}">Классика</td>
+        <td th:text="${book.authorsInfo}">Толстой Л.Н</td>
+        <td sec:authorize="hasRole('ROLE_ADMIN')">
+            <a href="editBook.html" th:href="@{/book/{id}/update(id=${book.id})}">Изменить</a>
+        </td>
+        <td sec:authorize="hasRole('ROLE_ADMIN')">
+            <form th:action="@{/book/{id}/delete(id=${book.id})}" method="post">
+                <button class="pure-button" type="submit" onclick="return confirm('Уверены, что хотите удалить?')">
+                    Удалить
+                </button>
+            </form>
+        </td>
+
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
