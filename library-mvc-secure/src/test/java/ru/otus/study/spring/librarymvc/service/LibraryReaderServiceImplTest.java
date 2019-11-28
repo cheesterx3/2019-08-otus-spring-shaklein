@@ -5,13 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Sort;
 import ru.otus.study.spring.librarymvc.domain.Book;
 import ru.otus.study.spring.librarymvc.domain.BookComment;
 import ru.otus.study.spring.librarymvc.domain.User;
-import ru.otus.study.spring.librarymvc.exception.DaoException;
 import ru.otus.study.spring.librarymvc.exception.NotFoundException;
 import ru.otus.study.spring.librarymvc.repository.AuthorRepository;
 import ru.otus.study.spring.librarymvc.repository.BookCommentRepository;
@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(classes = LibraryReaderServiceImpl.class)
+@EnableConfigurationProperties
 @DisplayName(" сервис работы с книгами из библиотеки должен ")
 class LibraryReaderServiceImplTest {
     private final static String MISSING_BOOK_ID = "some_unusual_ident";
@@ -86,13 +86,13 @@ class LibraryReaderServiceImplTest {
     @Test
     @DisplayName(" корректно добавлять новый комментарий к книге ")
     void commentBook() throws NotFoundException {
-        final Optional<BookComment> bookComment = libraryReaderService.commentBook("some_code", "some comment",user);
+        final Optional<BookComment> bookComment = libraryReaderService.commentBook("some_code", "some comment", user);
         assertThat(bookComment).isPresent().get().isEqualTo(testComment);
     }
 
     @Test
     @DisplayName(" выкидывать exception при попытке добавить комментарий к несуществующей книге ")
     void commentMissingBook() {
-        assertThrows(NotFoundException.class, () -> libraryReaderService.commentBook(MISSING_BOOK_ID, "some comment",user));
+        assertThrows(NotFoundException.class, () -> libraryReaderService.commentBook(MISSING_BOOK_ID, "some comment", user));
     }
 }

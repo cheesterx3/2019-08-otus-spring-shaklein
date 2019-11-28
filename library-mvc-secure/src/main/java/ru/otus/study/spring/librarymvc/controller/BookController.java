@@ -69,7 +69,7 @@ public class BookController {
     }
 
     @PostMapping("/book/{id}/delete")
-    public String bookList(@PathVariable(name = "id") String bookID) {
+    public String deleteBook(@PathVariable(name = "id") String bookID) {
         storageService.deleteBook(bookID);
         return "redirect:/";
     }

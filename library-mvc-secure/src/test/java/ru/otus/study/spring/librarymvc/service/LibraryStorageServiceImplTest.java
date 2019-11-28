@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.study.spring.librarymvc.domain.Author;
@@ -14,15 +15,18 @@ import ru.otus.study.spring.librarymvc.exception.DaoException;
 import ru.otus.study.spring.librarymvc.repository.AuthorRepository;
 import ru.otus.study.spring.librarymvc.repository.BookRepository;
 import ru.otus.study.spring.librarymvc.repository.GenreRepository;
+import ru.otus.study.spring.librarymvc.securityacl.dao.AclRepository;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(classes = LibraryStorageServiceImpl.class)
+@EnableConfigurationProperties
 @DisplayName(" сервис управления книгами в библиотеке должен ")
 class LibraryStorageServiceImplTest {
 
@@ -47,6 +51,8 @@ class LibraryStorageServiceImplTest {
     private AuthorRepository authorRepository;
     @MockBean
     private GenreRepository genreRepository;
+    @MockBean
+    private LibraryPermissionAttachService permissionAttachService;
     @Autowired
     private LibraryStorageService libraryStorageService;
 
@@ -61,6 +67,7 @@ class LibraryStorageServiceImplTest {
         given(authorRepository.existsByNameEqualsIgnoreCase(EXISTING_AUTHOR_ID)).willReturn(true);
         given(bookRepository.hasBookWithSingleGenreId(EXISTING_GENRE_ID)).willReturn(true);
         given(bookRepository.hasBookWithSingleAuthorId(EXISTING_AUTHOR_ID)).willReturn(true);
+        given(permissionAttachService.addDefaultPermissionsForBook(any())).willReturn(testBook);
     }
 
     @Test

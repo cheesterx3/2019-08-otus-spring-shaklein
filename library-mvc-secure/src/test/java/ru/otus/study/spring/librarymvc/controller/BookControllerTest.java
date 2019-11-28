@@ -9,8 +9,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.study.spring.librarymvc.domain.Author;
 import ru.otus.study.spring.librarymvc.domain.Book;
@@ -29,10 +31,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@DisplayName("Контроллер работы с книгами должен")
 @WebMvcTest(value = BookController.class)
 @EnableConfigurationProperties
 @AutoConfigureDataMongo
-@DisplayName("Контроллер работы с книгами должен")
+@ComponentScan({"ru.otus.study.spring.librarymvc.security"})
+@WithUserDetails("admin")
+@Import(UserDetailsTestConfiguration.class)
 class BookControllerTest {
     private final static String TEST_BOOK_NAME = "TestBook";
     private final static String TEST_AUTHOR_NAME = "AuthorName";
@@ -70,11 +75,9 @@ class BookControllerTest {
                 .andExpect(view().name("books"))
                 .andExpect(model().attributeExists("books"))
                 .andExpect(model().attribute("books", expectedModel))
-                .andDo(print())
                 .andReturn();
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("при переходе в редактирование должен передать во view с именем editBook модель с книгой и списками авторов и жанров")
     @Test
     void shouldShowEditBookPage() throws Exception {
@@ -90,7 +93,6 @@ class BookControllerTest {
                 .andReturn();
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("при успешном удалении книги должен редиректить на страницу со списком книг")
     @Test
     void shouldRedirectToListOnBookDelete() throws Exception {
@@ -98,7 +100,6 @@ class BookControllerTest {
                 .andExpect(redirectedUrl("/"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("отображать страничку добавления новой книги")
     @Test
     void showShowAddBookPage() throws Exception {
@@ -111,7 +112,6 @@ class BookControllerTest {
                 .andExpect(model().attributeExists("bookForm"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("при успешном добавлении книги должен редиректить на страницу со списком книг")
     @Test
     void shouldRedirectToListOnBookAdd() throws Exception {
@@ -122,7 +122,6 @@ class BookControllerTest {
                 .andExpect(redirectedUrl("/book/add"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен выдать ошибку валидации при попытке добавления кнрига без имени")
     @Test
     void shouldShowValidationErrorOnBookAdd() throws Exception {
@@ -130,10 +129,9 @@ class BookControllerTest {
         this.mvc.perform(post("/book/add")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content("name=&authorId=[]&genreId=[]"))
-                .andExpect(model().attributeHasFieldErrors("bookForm","name"));
+                .andExpect(model().attributeHasFieldErrors("bookForm", "name"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен открывать страницу ошибки 404 при редактирвоании несуществующей книги")
     @Test
     void shouldShowErrorPageOnIncorrectBookEditPage() throws Exception {
@@ -141,7 +139,6 @@ class BookControllerTest {
                 .andExpect(view().name("err404"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен открывать страницу редактирования книги")
     @Test
     void shouldShowBookEditPage() throws Exception {
@@ -150,7 +147,6 @@ class BookControllerTest {
                 .andExpect(view().name("editBook"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен возвращаться на страницу редактирования книги после успеха редактирования")
     @Test
     void shouldRedirectToEditBookPageAfterEditApply() throws Exception {
@@ -162,7 +158,6 @@ class BookControllerTest {
                 .andExpect(redirectedUrl("/book/book-id/update"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен выдать ошибку валидации при попытке сохранения книги без имени")
     @Test
     void shouldShowValidationErrorOnBookSave() throws Exception {
@@ -171,10 +166,9 @@ class BookControllerTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", "book-id")
                 .content("name="))
-                .andExpect(model().attributeHasFieldErrors("bookForm","name"));
+                .andExpect(model().attributeHasFieldErrors("bookForm", "name"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен возвращаться на страницу редактирования книги после добавления жанра к книге")
     @Test
     void shouldRedirectToEditBookPageAfterAddGenre() throws Exception {
@@ -182,7 +176,6 @@ class BookControllerTest {
                 .andExpect(redirectedUrl("/book/book-id/update"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен возвращаться на страницу редактирования книги после добавления автора к книге")
     @Test
     void shouldRedirectToEditBookPageAfterAddAuthor() throws Exception {
@@ -190,7 +183,6 @@ class BookControllerTest {
                 .andExpect(redirectedUrl("/book/book-id/update"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен возвращаться на страницу редактирования книги после удаления автора у книги")
     @Test
     void shouldRedirectToEditBookPageAfterDeleteAuthor() throws Exception {
@@ -198,7 +190,6 @@ class BookControllerTest {
                 .andExpect(redirectedUrl("/book/book-id/update"));
     }
 
-    @WithMockUser(roles = "ADMIN")
     @DisplayName("должен возвращаться на страницу редактирования книги после удаления жанра у книги")
     @Test
     void shouldRedirectToEditBookPageAfterDeleteGenre() throws Exception {

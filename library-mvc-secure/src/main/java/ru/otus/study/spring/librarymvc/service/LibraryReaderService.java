@@ -2,7 +2,6 @@ package ru.otus.study.spring.librarymvc.service;
 
 
 import ru.otus.study.spring.librarymvc.domain.*;
-import ru.otus.study.spring.librarymvc.exception.DaoException;
 import ru.otus.study.spring.librarymvc.exception.NotFoundException;
 
 import java.util.List;

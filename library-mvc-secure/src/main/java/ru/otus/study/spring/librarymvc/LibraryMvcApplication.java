@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableWebSecurity
 @SpringBootApplication
 @EnableMongoRepositories
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableConfigurationProperties
 public class LibraryMvcApplication {
 

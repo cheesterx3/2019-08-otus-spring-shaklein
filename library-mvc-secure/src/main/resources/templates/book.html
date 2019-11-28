@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title th:text="#{book.pagetitle(${book.name})}">Страница книги</title>
-    <link rel="stylesheet" href="../static/css/pure.css" th:href="@{/css/pure.css}">
-    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+    <link href="../static/css/pure.css" rel="stylesheet" th:href="@{/css/pure.css}">
+    <link href="../static/css/style.css" rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="block">
 <h1 th:text="${book.name}">Название книги</h1>
@@ -14,19 +14,20 @@
 <div style="margin-top: 24px">
     <h3>Комментарии читателей:</h3>
     <div sec:authorize="isAuthenticated()">
-        <form th:action="@{/book/comment}" th:object="${commentForm}" method="post">
-            <input type="hidden" name="id" th:value="${book.id}">
-            <textarea th:field="*{comment}" name="comment"></textarea>
+        <form method="post" th:action="@{/book/comment}" th:object="${commentForm}">
+            <input name="id" th:value="${book.id}" type="hidden">
+            <textarea name="comment" th:field="*{comment}"></textarea>
             <div>
                 <button class="pure-button" type="submit">Добавить</button>
             </div>
-            <span class="error" th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}">Какая-то ошибка</span>
+            <span class="error" th:errors="*{comment}" th:if="${#fields.hasErrors('comment')}">Какая-то ошибка</span>
         </form>
     </div>
     <div class="comment" th:each="comment:${comments}">
         <div class="comment-meta"><span th:text="${comment.getUser().getName()}">Пользователь</span></div>
         <div th:text="${comment.getText()}">Текст комментария</div>
-        <div class="comment-meta"><span th:text="${#temporals.format(comment.getTime(), 'dd-MM-yyyy HH:mm')}">10.12.2019 10:00</span></div>
+        <div class="comment-meta"><span th:text="${#temporals.format(comment.getTime(), 'dd-MM-yyyy HH:mm')}">10.12.2019 10:00</span>
+        </div>
     </div>
 </div>
 </body>

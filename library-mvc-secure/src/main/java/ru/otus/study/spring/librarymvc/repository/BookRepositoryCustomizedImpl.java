@@ -25,11 +25,6 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 public class BookRepositoryCustomizedImpl implements BookRepositoryCustomized {
     private final MongoTemplate mongoTemplate;
 
-    @Data
-    private class ArraySizeProjection {
-        private int size;
-    }
-
     @Override
     public void removeGenreFromBookByBookId(String bookId, String genreId) throws DaoException {
         checkForGenreAvailableToRemoveFromBook(bookId, genreId);
@@ -60,7 +55,6 @@ public class BookRepositoryCustomizedImpl implements BookRepositoryCustomized {
         );
         return mongoTemplate.aggregate(aggregation, Book.class, Genre.class).getMappedResults();
     }
-
 
     @Override
     public void removeAuthorFromBookByBookId(String bookId, String authorId) throws DaoException {
@@ -108,13 +102,18 @@ public class BookRepositoryCustomizedImpl implements BookRepositoryCustomized {
         return Objects.nonNull(arraySizeProjection) && (arraySizeProjection.size > 1);
     }
 
-    public boolean hasBookWithSingleAuthorId(String authorId){
-        Query query=new Query(Criteria.where("authors").size(1).and("authors.$id").is(new ObjectId(authorId)));
+    public boolean hasBookWithSingleAuthorId(String authorId) {
+        Query query = new Query(Criteria.where("authors").size(1).and("authors.$id").is(new ObjectId(authorId)));
         return mongoTemplate.exists(query, Book.class);
     }
 
-    public boolean hasBookWithSingleGenreId(String genreId){
-        Query query=new Query(Criteria.where("genres").size(1).and("genres._id").is(new ObjectId(genreId)));
+    public boolean hasBookWithSingleGenreId(String genreId) {
+        Query query = new Query(Criteria.where("genres").size(1).and("genres._id").is(new ObjectId(genreId)));
         return mongoTemplate.exists(query, Book.class);
+    }
+
+    @Data
+    private class ArraySizeProjection {
+        private int size;
     }
 }
