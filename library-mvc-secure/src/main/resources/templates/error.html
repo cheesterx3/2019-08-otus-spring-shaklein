@@ -5,25 +5,25 @@
     <title>Что-то пошло не так</title>
 </head>
 <body>
-    <h1>Произошла ошибка(надо же)</h1>
-    <table>
-        <tr>
-            <td>Время</td>
-            <td th:text="${timestamp}"/>
-        </tr>
-        <tr>
-            <td>Тип ошибки</td>
-            <td th:text="${error}"/>
-        </tr>
-        <tr>
-            <td>Код</td>
-            <td th:text="${status}"/>
-        </tr>
-        <tr>
-            <td>Ошибка</td>
-            <td th:text="${message}"/>
-        </tr>
+<h1>Произошла ошибка(надо же)</h1>
+<table>
+    <tr>
+        <td>Время</td>
+        <td th:text="${timestamp}"/>
+    </tr>
+    <tr>
+        <td>Тип ошибки</td>
+        <td th:text="${error}"/>
+    </tr>
+    <tr>
+        <td>Код</td>
+        <td th:text="${status}"/>
+    </tr>
+    <tr>
+        <td>Ошибка</td>
+        <td th:text="${message}"/>
+    </tr>
 
-    </table>
+</table>
 </body>
 </html>

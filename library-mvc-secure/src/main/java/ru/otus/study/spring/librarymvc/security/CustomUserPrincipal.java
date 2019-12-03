@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.toList;
 public class CustomUserPrincipal implements UserDetails {
     private final User user;
 
-    CustomUserPrincipal(User user) {
+    public CustomUserPrincipal(User user) {
         this.user = user;
     }
 
@@ -60,7 +60,7 @@ public class CustomUserPrincipal implements UserDetails {
         return user.getName();
     }
 
-    public User getUser(){
+    public User getUser() {
         return user;
     }
 }

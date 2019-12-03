@@ -4,23 +4,36 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.otus.study.spring.librarymvc.domain.Author;
 import ru.otus.study.spring.librarymvc.domain.Book;
 import ru.otus.study.spring.librarymvc.domain.BookComment;
 import ru.otus.study.spring.librarymvc.domain.Genre;
 import ru.otus.study.spring.librarymvc.exception.DaoException;
+import ru.otus.study.spring.librarymvc.securityacl.dao.AclRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Репозиторий работы с книгами должен ")
-@ComponentScan("ru.otus.study.spring.librarymvc.events")
-class BookRepositoryTest extends AbstractRepositoryTest {
+@DataMongoTest
+@EnableConfigurationProperties
+@ComponentScan({"ru.otus.study.spring.librarymvc.config",
+        "ru.otus.study.spring.librarymvc.repository",
+        "ru.otus.study.spring.librarymvc.events",
+        "ru.otus.study.spring.librarymvc.security",
+        "ru.otus.study.spring.librarymvc.securityacl.dao"})
+@WithMockUser(roles = "ADMIN")
+class BookRepositoryTest {
 
     @Autowired
     private BookRepository bookRepository;
@@ -30,9 +43,14 @@ class BookRepositoryTest extends AbstractRepositoryTest {
     private AuthorRepository authorRepository;
     @Autowired
     private BookCommentRepository bookCommentRepository;
+    @Autowired
+    private AclRepository aclRepository;
+    @Autowired
+    private MutableAclService aclService;
 
     @DisplayName("при удалении книги удалить все ссылающиеся на неё комментарии")
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldRemoveBookCommentsOnBookDeletion() {
         final List<Book> allBooks = bookRepository.findAll();
         final Book book = allBooks.get(0);
@@ -40,6 +58,18 @@ class BookRepositoryTest extends AbstractRepositoryTest {
         bookRepository.delete(book);
         final List<BookComment> comments = bookCommentRepository.findAllByBookIdOrderByTimeDesc(book.getId());
         assertThat(comments).isEmpty();
+    }
+
+    @DisplayName("при удалении книги удалить данные по доступу для книги")
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void shouldRemoveBookAclOnBookDeletion() {
+        final List<Book> allBooks = bookRepository.findAll();
+        final Book book = allBooks.get(0);
+
+        bookRepository.delete(book);
+        assertThat(aclRepository.findById(new ObjectIdentityImpl(Book.class, book.getId()).getIdentifier()))
+                .isNotPresent();
     }
 
     @DisplayName("при удалении единственного жанра из книга должен выкидывать исключение")
@@ -54,6 +84,7 @@ class BookRepositoryTest extends AbstractRepositoryTest {
 
     @DisplayName("корректно удалять жанр у книги, если он не единственный")
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldCorrectGenreRemoveFromBook() throws DaoException {
         final List<Book> allBooks = bookRepository.findAll();
         final Book book = allBooks.get(0);
@@ -81,6 +112,7 @@ class BookRepositoryTest extends AbstractRepositoryTest {
 
     @DisplayName("корректно удалять автора у книги, если он не единственный")
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldCorrectAuthorRemoveFromBook() throws DaoException {
         final List<Book> allBooks = bookRepository.findAll();
         final Book book = allBooks.get(2);
@@ -127,7 +159,7 @@ class BookRepositoryTest extends AbstractRepositoryTest {
 
     @DisplayName("корректно добавлять автора к книге")
     @Test
-    void shouldCorrectAuthorAddToBook() throws DaoException {
+    void shouldCorrectAuthorAddToBook() {
         final List<Book> allBooks = bookRepository.findAll();
         final List<Author> authorList = authorRepository.findAll();
         final Book book = allBooks.get(0);
@@ -145,7 +177,7 @@ class BookRepositoryTest extends AbstractRepositoryTest {
 
     @DisplayName("корректно добавлять жанр к книге")
     @Test
-    void shouldCorrectGenreAddToBook() throws DaoException {
+    void shouldCorrectGenreAddToBook() {
         final List<Book> allBooks = bookRepository.findAll();
         final List<Genre> genreList = genreRepository.findAll();
         final Book book = allBooks.get(0);

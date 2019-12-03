@@ -22,7 +22,7 @@ public class MongoAuthorsEventsListener extends CustomizedAbstractMongoEventList
     @Override
     public void onBeforeDelete(BeforeDeleteEvent<Author> event) {
         super.onBeforeDelete(event);
-        final String id=getObjectId(event);
+        final String id = getObjectId(event);
         if (bookRepository.hasBookWithSingleAuthorId(id)) {
             throw new RuntimeException("Unable to remove author, cause it assigned to book(s). Remove author from book(s) first");
         }

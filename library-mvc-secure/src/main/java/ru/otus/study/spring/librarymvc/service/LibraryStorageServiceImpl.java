@@ -1,7 +1,9 @@
 package ru.otus.study.spring.librarymvc.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.study.spring.librarymvc.domain.Author;
 import ru.otus.study.spring.librarymvc.domain.Book;
 import ru.otus.study.spring.librarymvc.domain.Genre;
@@ -19,15 +21,18 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
     private final AuthorRepository authorRepository;
     private final BookRepository bookRepository;
     private final GenreRepository genreRepository;
+    private final LibraryPermissionAttachService permissionAttachService;
 
     @Override
+    @Transactional
     public Optional<Book> addNewBook(String name, String authorId, String genreName) throws DaoException {
         if (Objects.isNull(genreName)) {
             throw new DaoException("Genre name cannot be null");
         }
         final Author author = getAuthor(authorId);
         final Genre genre = findOrCreateGenre(genreName);
-        return Optional.of(bookRepository.save(new Book(name, author, genre)));
+        return Optional.of(bookRepository.save(new Book(name, author, genre)))
+                .map(permissionAttachService::addDefaultPermissionsForBook);
     }
 
     private Author getAuthor(String authorId) throws DaoException {
@@ -36,6 +41,7 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
     }
 
     @Override
+    @Transactional
     public Optional<Book> addNewBookWithGenreId(String name, String authorId, String genreId) throws DaoException {
         if (Objects.isNull(genreId)) {
             throw new DaoException("Genre name cannot be null");
@@ -43,7 +49,8 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
         final Author author = getAuthor(authorId);
         final Optional<Genre> genreOptional = genreRepository.findById(genreId);
         final Genre genre = genreOptional.orElseThrow(() -> new DaoException("Genre not found"));
-        return Optional.of(bookRepository.save(new Book(name, author, genre)));
+        return Optional.of(bookRepository.save(new Book(name, author, genre)))
+                .map(permissionAttachService::addDefaultPermissionsForBook);
     }
 
     @Override
@@ -68,6 +75,7 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
     }
 
     @Override
+    @PreAuthorize(value = "hasPermission(#book,'ADMINISTRATION')")
     public void updateBook(Book book) {
         bookRepository.save(book);
     }
@@ -141,7 +149,7 @@ public class LibraryStorageServiceImpl implements LibraryStorageService {
     @Override
     public void addAuthorToBook(String bookId, String authorId) throws DaoException {
         checkForBookIsPresentById(bookId);
-        if(Objects.isNull(authorId)){
+        if (Objects.isNull(authorId)) {
             throw new DaoException("Author cannot be null");
         }
         if (bookRepository.existsByIdAndAuthorsContains(bookId, authorId)) {

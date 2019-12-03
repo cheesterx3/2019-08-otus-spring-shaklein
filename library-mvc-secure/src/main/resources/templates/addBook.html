@@ -3,40 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>Новая книга</title>
-    <link rel="stylesheet" href="../static/css/pure.css" th:href="@{/css/pure.css}">
-    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+    <link href="../static/css/pure.css" rel="stylesheet" th:href="@{/css/pure.css}">
+    <link href="../static/css/style.css" rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="block">
 <h1>Добавление книги</h1>
-<form class="pure-form pure-form-aligned" th:object="${bookForm}" th:action="@{/book/add}" method="post">
+<form class="pure-form pure-form-aligned" method="post" th:action="@{/book/add}" th:object="${bookForm}">
     <fieldset>
         <div class="pure-control-group">
             <label for="name">Название книги</label>
-            <input id="name" name="name" th:field="*{name}" type="text" placeholder="Название книги">
-            <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Какая-то ошибка</span>
+            <input id="name" name="name" placeholder="Название книги" th:field="*{name}" type="text">
+            <span class="error" th:errors="*{name}" th:if="${#fields.hasErrors('name')}">Какая-то ошибка</span>
         </div>
         <div class="pure-control-group">
             <label for="genre">Жанр</label>
             <select id="genre" name="genreId" th:field="*{genreId}">
-                <option value="" selected>-Выберите жанр-</option>
-                <option th:each="genre:${genres}" value="Классика" th:value="${genre.id}" th:text="${genre.name}">
+                <option selected value="">-Выберите жанр-</option>
+                <option th:each="genre:${genres}" th:text="${genre.name}" th:value="${genre.id}" value="Классика">
                     Классика
                 </option>
             </select>
-            <span class="error" th:if="${#fields.hasErrors('genreId')}" th:errors="*{genreId}">Какая-то ошибка</span>
+            <span class="error" th:errors="*{genreId}" th:if="${#fields.hasErrors('genreId')}">Какая-то ошибка</span>
         </div>
         <div class="pure-control-group">
             <label for="author">Автор</label>
             <select id="author" name="authorId" th:field="*{authorId}">
-                <option value="" selected>-Выберите автора-</option>
-                <option th:each="author:${authors}" value="1" th:value="${author.id}" th:text="${author.name}">Толстой
+                <option selected value="">-Выберите автора-</option>
+                <option th:each="author:${authors}" th:text="${author.name}" th:value="${author.id}" value="1">Толстой
                     Л.Н
                 </option>
             </select>
-            <span class="error" th:if="${#fields.hasErrors('authorId')}" th:errors="*{authorId}">Какая-то ошибка</span>
+            <span class="error" th:errors="*{authorId}" th:if="${#fields.hasErrors('authorId')}">Какая-то ошибка</span>
         </div>
         <div class="pure-controls">
-            <button type="submit" class="pure-button pure-button-primary">Добавить</button>
+            <button class="pure-button pure-button-primary" type="submit">Добавить</button>
         </div>
     </fieldset>
 </form>

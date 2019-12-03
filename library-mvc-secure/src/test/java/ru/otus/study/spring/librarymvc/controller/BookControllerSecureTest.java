@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.study.spring.librarymvc.service.LibraryReaderService;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = BookController.class)
 @EnableConfigurationProperties
 @AutoConfigureDataMongo
+@ComponentScan({"ru.otus.study.spring.librarymvc.security"})
 @DisplayName("Контроллер работы с книгами ")
 class BookControllerSecureTest {
     @Autowired
@@ -99,4 +101,5 @@ class BookControllerSecureTest {
         this.mvc.perform(post("/book/book-id/genre/genre-id/delete"))
                 .andExpect(status().isForbidden());
     }
+
 }

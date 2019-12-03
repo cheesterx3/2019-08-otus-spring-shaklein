@@ -2,17 +2,13 @@ package ru.otus.study.spring.librarymvc.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.otus.study.spring.librarymvc.domain.*;
-import ru.otus.study.spring.librarymvc.exception.DaoException;
 import ru.otus.study.spring.librarymvc.exception.NotFoundException;
 import ru.otus.study.spring.librarymvc.repository.AuthorRepository;
 import ru.otus.study.spring.librarymvc.repository.BookCommentRepository;
 import ru.otus.study.spring.librarymvc.repository.BookRepository;
 import ru.otus.study.spring.librarymvc.repository.GenreRepository;
-import ru.otus.study.spring.librarymvc.security.CustomUserPrincipal;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +55,7 @@ public class LibraryReaderServiceImpl implements LibraryReaderService {
     public Optional<BookComment> commentBook(String bookId, String comment, User user) throws NotFoundException {
         final Optional<Book> book = bookRepository.findById(bookId);
         return book.map(bookValue
-                -> Optional.of(commentRepository.save(new BookComment(comment, bookValue,user)))
+                -> Optional.of(commentRepository.save(new BookComment(comment, bookValue, user)))
         ).orElseThrow(() -> new NotFoundException("Book was not found"));
     }
 }

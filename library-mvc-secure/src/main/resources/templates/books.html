@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Список книг</title>
-    <link rel="stylesheet" href="../static/css/pure.css" th:href="@{/css/pure.css}">
-    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+    <link href="../static/css/pure.css" rel="stylesheet" th:href="@{/css/pure.css}">
+    <link href="../static/css/style.css" rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="block">
-<div sec:authorize="isAuthenticated()">Добро пожаловать <span th:text="${#authentication.principal.description}">Имя пользователя</span></div>
-<div><a sec:authorize="!isAuthenticated()" th:href="@{/login}">Войти</a><a sec:authorize="isAuthenticated()" th:href="@{/logout}">Выйти</a></div>
+<div sec:authorize="isAuthenticated()">Добро пожаловать <span th:text="${#authentication.principal.description}">Имя пользователя</span>
+</div>
+<div><a sec:authorize="!isAuthenticated()" th:href="@{/login}">Войти</a><a sec:authorize="isAuthenticated()"
+                                                                           th:href="@{/logout}">Выйти</a></div>
 <h1>Список доступных книг в библиотеке</h1>
-<div><a sec:authorize="hasRole('ROLE_ADMIN')" href="addBook.html" th:href="@{/book/add}">Добавить</a></div>
+<div><a href="addBook.html" sec:authorize="hasAnyRole('LIBRARIAN','ADMIN')" th:href="@{/book/add}">Добавить</a></div>
 <table class="pure-table">
     <thead>
     <tr>
@@ -23,15 +25,15 @@
     </thead>
     <tbody>
     <tr th:each="book:${books}">
-        <td><a th:href="@{/book/{id}(id=${book.id})}" href="/book/someid" th:text="${book.name}">Война и Мир</a></td>
+        <td><a href="/book/someid" th:href="@{/book/{id}(id=${book.id})}" th:text="${book.name}">Война и Мир</a></td>
         <td th:text="${book.genresInfo}">Классика</td>
         <td th:text="${book.authorsInfo}">Толстой Л.Н</td>
-        <td sec:authorize="hasRole('ROLE_ADMIN')">
+        <td sec:authorize="hasPermission(#vars.book,'ADMINISTRATION')">
             <a href="editBook.html" th:href="@{/book/{id}/update(id=${book.id})}">Изменить</a>
         </td>
-        <td sec:authorize="hasRole('ROLE_ADMIN')">
-            <form th:action="@{/book/{id}/delete(id=${book.id})}" method="post">
-                <button class="pure-button" type="submit" onclick="return confirm('Уверены, что хотите удалить?')">
+        <td sec:authorize="hasPermission(#vars.book,'ADMINISTRATION')">
+            <form method="post" th:action="@{/book/{id}/delete(id=${book.id})}">
+                <button class="pure-button" onclick="return confirm('Уверены, что хотите удалить?')" type="submit">
                     Удалить
                 </button>
             </form>
