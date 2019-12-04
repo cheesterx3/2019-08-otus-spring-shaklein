@@ -23,12 +23,10 @@ public class Book {
     private long id;
     @Column(name = "name")
     private String name;
-
     @ManyToMany(targetEntity = Author.class, fetch = FetchType.EAGER)
     @JoinTable(name = "ref_book_author", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "author_id"))
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Author> authors;
-
     @ManyToMany(targetEntity = Genre.class, fetch = FetchType.EAGER)
     @JoinTable(name = "ref_book_genre", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     @Fetch(value = FetchMode.SUBSELECT)

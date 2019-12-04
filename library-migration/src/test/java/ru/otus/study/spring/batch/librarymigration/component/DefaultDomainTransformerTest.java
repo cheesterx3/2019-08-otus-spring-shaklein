@@ -22,13 +22,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-@SpringBootTest(classes = DomainTransformer.class,
+@SpringBootTest(classes = DefaultDomainTransformer.class,
         properties = {
                 ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false",
                 InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false"
         })
 @DisplayName("Сервис преобразования jdbc-объектов в mongo-сущности")
-class DomainTransformerTest {
+class DefaultDomainTransformerTest {
     @MockBean
     private MongoTemplate mongoTemplate;
     @Autowired
