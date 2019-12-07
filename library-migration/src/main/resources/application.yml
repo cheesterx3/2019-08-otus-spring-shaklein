@@ -1,0 +1,19 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  batch:
+    job:
+      enabled: false
+  datasource:
+    url: jdbc:h2:mem:librarydb
+    initialization-mode: always
+  jpa:
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+  data:
+    mongodb:
+      uri: mongodb://localhost
+      port: 27017
+      database: libraryMigrate
