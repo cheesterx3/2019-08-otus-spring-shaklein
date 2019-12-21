@@ -9,6 +9,5 @@ management:
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost
-      port: 27017
-      database: library
+      uri: mongodb://library-mongo
+      database: ${DB_NAME}
