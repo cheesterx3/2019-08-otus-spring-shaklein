@@ -10,6 +10,7 @@ services:
     command: mongod --logpath=/dev/null
 
   library-server:
+    image: "library-server"
     build: ./library-web-server
     container_name: library-server
     environment:
@@ -23,6 +24,7 @@ services:
       - library-mongo
 
   library-vue:
+    image: "library-vue"
     build: ./library-vue
     container_name: library-vue
     ports:
