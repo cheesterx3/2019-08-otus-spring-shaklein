@@ -1,0 +1,14 @@
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "health,logfile,metrics,info,prometheus"
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost
+      port: 27017
+      database: library
