@@ -1,0 +1,31 @@
+version: '3'
+services:
+
+  library-mongo:
+    image: "mongo:latest"
+    container_name: library-mongo
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    restart: always
+    command: mongod --logpath=/dev/null
+
+  library-server:
+    image: "library-server"
+    build: ./library-web-server
+    container_name: library-server
+    environment:
+      - DB_SERVER=library-mongo
+      - DB_NAME=library
+    ports:
+      - ${APP_SERVER_PORT}:${APP_SERVER_PORT}
+    links:
+      - library-mongo
+    depends_on:
+      - library-mongo
+
+  library-vue:
+    image: "library-vue"
+    build: ./library-vue
+    container_name: library-vue
+    ports:
+      - ${APP_FRONT_PORT}:${APP_SERVER_PORT}

@@ -16,6 +16,7 @@ import ru.otus.study.spring.libraryweb.domain.Book;
 import ru.otus.study.spring.libraryweb.domain.Genre;
 import ru.otus.study.spring.libraryweb.exception.DaoException;
 import ru.otus.study.spring.libraryweb.exception.NotFoundException;
+import ru.otus.study.spring.libraryweb.service.BookPopularityService;
 import ru.otus.study.spring.libraryweb.service.LibraryReaderService;
 import ru.otus.study.spring.libraryweb.service.LibraryStorageService;
 
@@ -49,6 +50,8 @@ class BookControllerTest {
     private LibraryReaderService libraryReaderService;
     @MockBean
     private LibraryStorageService libraryStorageService;
+    @MockBean
+    private BookPopularityService popularityService;
 
     @BeforeEach
     void setUp() {
